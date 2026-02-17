@@ -1,0 +1,68 @@
+import { MailerService } from '@nestjs-modules/mailer';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { SentMessageInfo } from 'nodemailer';
+
+@Injectable()
+export class MailService {
+    constructor(private  readonly mailService:MailerService,private readonly config:ConfigService,private readonly jwtService:JwtService){}
+    async sendForgotPasswordMail(email:string,userId:string){
+        //generate token
+        const resetToken = await this.jwtService.signAsync({email,userId},{expiresIn:'1h',secret:this.config.get('RESET_SECRET_PASS')})
+        //send mail
+        return this.mailService.sendMail({
+            from:`Task_Manager<${this.config.get('MAIL_USER')}>`,
+            to: email,
+            subject:"Reset Password",
+            html: `<div>Reset Password
+             <a href="${this.config.get('BACKEND_URL')}/auth/reset-password?token=${resetToken}&id=${userId}">click here</a>
+             if button didn't work
+             <a href="${this.config.get('BACKEND_URL')}/auth/reset-password?token=${resetToken}&id=${userId}">
+             ${this.config.get('BACKEND_URL')}/auth/reset-password?token=${resetToken}&id=${userId}
+             </a>
+            </div>`
+        }).then(success=>{
+            console.log(success)
+            return success
+        }).catch(err=>{
+            throw new BadRequestException(err.message)
+        })
+    }
+
+    async sendVerificationMail(email:string,verifyToken:string,userId:string){
+        const result = await this.mailService.sendMail({
+           from:`Task_Manager<${this.config.get('MAIL_USER')}>`,
+            to: email,
+            subject:"Verify Email",
+            html: `<div>Please Verify Your Email
+             <a href="${this.config.get('BACKEND_URL')}/auth/verify-email?token=${verifyToken}&id=${userId}">click here</a>
+             if button didn't work
+             <a href="${this.config.get('BACKEND_URL')}/auth/verify-email?token=${verifyToken}&id=${userId}">
+             ${this.config.get('BACKEND_URL')}/auth/verify-email?token=${verifyToken}&id=${userId}
+             </a>
+            </div>`
+        })
+
+        if(result.rejected.length >0) throw new BadRequestException(`couldn't send verification email please try again`)
+        return result
+    }
+
+    async sendConfirmEmailPasswordReset(email:string){
+
+        const result = await this.mailService.sendMail({
+            from: `Task_Manager<${this.config.get('MAIL_USER')}>`,
+            to: email,
+            subject: `Changed Password`,
+            html: `
+            <div>
+            your password has been changed successfully
+            if you didn't change your password please change your password again
+            </div>
+            `
+        })
+        if(result.rejected.length >0) throw new BadRequestException(`couldn't send confirm password reset email please try again`)
+            return result
+    }
+        
+}
