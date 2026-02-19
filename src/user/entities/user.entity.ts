@@ -1,5 +1,8 @@
 import { Exclude } from 'class-transformer';
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm'
+import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.entity';
+import { Invitation } from 'src/workspace/entities/invitation.entity';
+import { Workspace } from 'src/workspace/entities/workspace.entity';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm'
 @Entity()
 export class User {
     @PrimaryGeneratedColumn("uuid")
@@ -38,4 +41,20 @@ export class User {
     
     @Column({type:'timestamp',nullable:true})
     lastLoginAt?:Date;
+
+
+    // A user can be a member of many workspaces
+    @OneToMany(()=>WorkspaceMember,(workspaceMember)=>workspaceMember.user)
+    memberships: WorkspaceMember[];
+
+    // A user can own many workspaces
+    @OneToMany(()=>Workspace, (workspace)=> workspace.owner )
+    ownedWorkspaces: Workspace[];
+
+    //invitationLink
+    @OneToMany(()=>Invitation,(invitation)=>invitation.sender)
+    sentInvitations: Invitation[];
+
+    @OneToMany(()=> Invitation,(invitation)=>invitation.invitedUser)
+    receivedInvitation:Invitation[];
 }

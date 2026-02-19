@@ -3,6 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { SentMessageInfo } from 'nodemailer';
+import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.entity';
 
 @Injectable()
 export class MailService {
@@ -63,6 +64,23 @@ export class MailService {
         })
         if(result.rejected.length >0) throw new BadRequestException(`couldn't send confirm password reset email please try again`)
             return result
+    }
+
+    async sendInvitationEmail(email:string,workspaceName:string,invitationId:string,senderId:string){
+        const result = await this.mailService.sendMail({
+            from: `Task_Manager<${this.config.get('MAIL_USER')}>`,
+            to: email,
+            subject: `Invitation-workspace`,
+            html: `
+            <div>
+            you are invited to workspace ${workspaceName}
+            <a href="${this.config.get('BACKEND_URL')}/workspaces/accept-invitation?invitationId=${invitationId}&senderId=${senderId}" style="background-color: green;">Accept</a>
+            <a href="${this.config.get('BACKEND_URL')}/workspaces/decline-invitation?invitationId="${invitationId}&senderId=${senderId}" style="background-color: red;">Decline</a>
+            </div>
+            `
+        })
+        if(result.rejected.length >0) throw new BadRequestException(`couldn't send invitation email please try again later`)
+        return result
     }
         
 }

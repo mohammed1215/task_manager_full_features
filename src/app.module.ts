@@ -1,4 +1,4 @@
-import { ClassSerializerInterceptor, Module } from '@nestjs/common';
+import { ClassSerializerInterceptor, forwardRef, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
@@ -19,8 +19,9 @@ import {PassportModule} from '@nestjs/passport'
 import { MulterModule } from '@nestjs/platform-express';
 import multer from 'multer';
 import { existsSync, mkdirSync } from 'fs';
+import { Invitation } from './workspace/entities/invitation.entity';
 @Module({
-  imports: [UserModule, WorkspaceModule, WorkspaceMemberModule,ConfigModule.forRoot({
+  imports: [UserModule ,forwardRef(()=>WorkspaceModule), WorkspaceMemberModule,ConfigModule.forRoot({
     isGlobal:true
   }),
   TypeOrmModule.forRootAsync({
@@ -30,7 +31,7 @@ import { existsSync, mkdirSync } from 'fs';
         type:'postgres',
         url: config.get<string>('DATABASE_CONNECTION_STRING'),
         synchronize:true,
-        entities: [User,Workspace,WorkspaceMember]
+        entities: [User,Workspace,WorkspaceMember,Invitation]
       }
     }
   }), 

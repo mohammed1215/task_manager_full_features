@@ -1,1 +1,32 @@
-export class WorkspaceMember {}
+import { User } from "src/user/entities/user.entity";
+import { Workspace } from "src/workspace/entities/workspace.entity";
+import { Column, Entity,  ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+import { WorkspaceMemberRoles } from "../enum/WorkspaceMember.enum";
+
+@Entity()
+export class WorkspaceMember {
+    @PrimaryGeneratedColumn('uuid')
+    id :string;
+    
+    @Column({type:'enum',enum:WorkspaceMemberRoles})
+    role:WorkspaceMemberRoles;
+    
+    @Column({type:'timestamp', default: ()=> "CURRENT_TIMESTAMP"})
+    joinedAt:Date;
+
+    // relationships
+    @ManyToOne(()=>Workspace,(workspace)=> workspace.members, {
+        onDelete: 'CASCADE'
+    })
+    workspace:Workspace;
+
+    @ManyToOne(()=>User,(user)=>user.memberships, {
+        onDelete: 'CASCADE'
+    })
+    user:User;
+
+    @ManyToOne(()=>User, {
+        onDelete: 'CASCADE',
+    })
+    invitedBy : User
+}
