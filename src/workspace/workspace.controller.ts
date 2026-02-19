@@ -30,6 +30,23 @@ export class WorkspaceController {
     return this.workspaceService.findAll(user.userId,limit,page,filter);
   }
 
+  @Patch(':workspaceId')
+  @UseGuards(JwtGuard)
+  update(@User() user:jwtPayload,updateWorkspaceDto:UpdateWorkspaceDto){
+    this.workspaceService.update(user.userId,updateWorkspaceDto)
+  }
+
+  @Delete(':workspaceId')
+  @UseGuards(JwtGuard)
+  removeWorkspace(
+    @Param('workspaceId') workspaceId:string,
+    @User() user:jwtPayload,
+    @Body('workspaceName') workspaceName:string
+  ){
+    return this.workspaceService.removeWorkspace(user.userId,workspaceId,workspaceName)
+  }
+  
+
   @Get(':workspaceId/members')
   findMembers(@Param('workspaceId') workspaceId: string) {
     return this.workspaceService.findMembersForOneWorkspace(workspaceId);

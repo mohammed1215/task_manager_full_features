@@ -98,9 +98,27 @@ export class WorkspaceService {
     return workspace
   }
 
-  update(id: number, updateWorkspaceDto: UpdateWorkspaceDto) {
-    return `This action updates a #${id} workspace`;
+  async update(workspaceId: string, updateWorkspaceDto: UpdateWorkspaceDto) {
+    if(updateWorkspaceDto.name){
+      updateWorkspaceDto.slug = slugify(updateWorkspaceDto.name,{lower:true})
+    }
+
+    const updateResult = await this.workspaceRepo.update({id: workspaceId},{...updateWorkspaceDto})
+    if(!updateResult.affected) throw new NotFoundException("workspace not found")
+    return {message:"workspace has been updated successfully"};
   }
+
+async removeWorkspace(userId:string,workspaceId:string, workspaceName:string){
+  if(!workspaceName) throw new BadRequestException('Please Confirm Deletion')
+
+  const member =await this.workspaceMemberRepo.findOne({where: {user:{id:userId},workspace:{id:workspaceId}}})
+  if(!member) throw new NotFoundException('member not found in the workspace');
+
+  if(member.role !== WorkspaceMemberRoles.owner) throw new ForbiddenException('Not Allowed Privilages: Owner is the only one allowed to delete the workspace')
+    const result = await this.workspaceRepo.delete({id:workspaceId})
+  if(!result.affected) throw new NotFoundException('workspace not found')
+    return {message:"workspace has been deleted successfully"}
+}
 
   async findMembersForOneWorkspace(workspaceId:string){
     return this.workspaceMemberRepo.find({
@@ -140,7 +158,7 @@ export class WorkspaceService {
 
       //if the role was an owner check for the count of the members in the workspace that are admin if they were greater than 1 then delete it else remove it
       if(member.role === WorkspaceMemberRoles.owner){
-        const count = await this.workspaceMemberRepo.count({where:{workspace:{id:workspaceId},user:{id:userId},role:WorkspaceMemberRoles.owner}})
+        const count = await this.workspaceMemberRepo.count({where:{workspace:{id:workspaceId},role:WorkspaceMemberRoles.owner}})
         if(count<=1){
           throw new BadRequestException('cannot delete last owner');
         }
