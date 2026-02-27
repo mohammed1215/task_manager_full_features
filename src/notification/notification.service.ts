@@ -2,16 +2,18 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Notification } from './entities/notification.entity';
+import { Notification, NotificationTypes } from './entities/notification.entity';
 import { Repository } from 'typeorm';
 import { NotificationGateway } from './notification.gateway';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { TaskService } from 'src/task/task.service';
 
 @Injectable()
 export class NotificationService {
   constructor(
     @InjectRepository(Notification) 
     private readonly notificationRepo: Repository<Notification>,
-    
+    private readonly taskService: TaskService,
     // Inject Gateway with forwardRef to prevent circular dependency
     @Inject(forwardRef(() => NotificationGateway))
     private readonly gateway: NotificationGateway
@@ -63,6 +65,16 @@ export class NotificationService {
     const notificationCount  = await this.countNotifications(userId);
     this.gateway.sendToUser(userId, 'unread_count', notificationCount);
   }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async autoMarkOldNotificationsAsRead() {
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setTime(sevenDaysAgo.getTime() - 7 * 24 * 60 * 60 * 1000)
+    const result = await this.notificationRepo.update({isRead:false,createdAt: sevenDaysAgo },{isRead:true})
+    console.log('Automatically marked 7-day old notifications as read. Number of affected rows '+result.affected);
+  }
+
+ 
 
   update(id: number, updateNotificationDto: UpdateNotificationDto) {
     return `This action updates a #${id} notification`;

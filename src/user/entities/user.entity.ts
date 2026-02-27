@@ -10,6 +10,13 @@ import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.
 import { Invitation } from 'src/workspace/entities/invitation.entity';
 import { Workspace } from 'src/workspace/entities/workspace.entity';
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm'
+
+export enum EmailPreference {
+  IMMEDIATE = 'immediate',
+  DAILY_DIGEST = 'daily_digest',
+  DISABLED = 'disabled'
+}
+
 @Entity()
 export class User {
     @PrimaryGeneratedColumn("uuid")
@@ -37,6 +44,9 @@ export class User {
     @Column({type:'boolean',default:false})
     emailVerified:boolean;
     
+    @Column({ type: 'enum', enum: EmailPreference, default: EmailPreference.IMMEDIATE })
+    emailPreference: EmailPreference;
+
     @Column({type:'boolean',default:false})
     isActive:boolean
     
@@ -49,6 +59,7 @@ export class User {
     @Column({type:'timestamp',nullable:true})
     lastLoginAt?:Date;
 
+    
 
     // A user can be a member of many workspaces
     @OneToMany(()=>WorkspaceMember,(workspaceMember)=>workspaceMember.user)

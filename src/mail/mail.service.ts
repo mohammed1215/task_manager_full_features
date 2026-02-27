@@ -113,6 +113,21 @@ export class MailService {
         return result
     }
 
+    async sendTaskAssignedEmail(email:string){
+        const result = await this.mailService.sendMail({
+           from: `Task_Manager<${this.config.get('MAIL_USER')}>`,
+            to: email,
+            subject: `Task Assignment`,
+            html: `
+            <div>
+            You got assigned to new task
+            </div>
+            `
+        })
+        if(result.rejected.length >0) console.log(`couldn't send assignee email to users please try again later`)
+        return result
+    }
+
     async sendUnassignEmailNotification(email:string){
         const result = await this.mailService.sendMail({
            from: `Task_Manager<${this.config.get('MAIL_USER')}>`,
@@ -120,7 +135,22 @@ export class MailService {
             subject: `Task Unassignment`,
             html: `
             <div>
-            You got assigned to new task
+            user got unassigned from task
+            </div>
+            `
+        })
+        if(result.rejected.length >0) console.log(`couldn't send unassign email notification to user please try again later`)
+        return result
+    }
+
+    async sendDueTaskNotification(email:string){
+        const result = await this.mailService.sendMail({
+           from: `Task_Manager<${this.config.get('MAIL_USER')}>`,
+            to: email,
+            subject: `Task Due Soon`,
+            html: `
+            <div>
+                due task tomorrow
             </div>
             `
         })

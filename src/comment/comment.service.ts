@@ -59,7 +59,12 @@ export class CommentService {
       ...commentData,
       task: {id: taskId},
     })
-    return this.commentRepo.save(comment);
+
+    const savedComment = this.commentRepo.save(comment)
+
+    // TODO: send notification for mentioned users
+    
+    return savedComment;
   }
 
   findAll(taskId:string,page:number,limit:number) {

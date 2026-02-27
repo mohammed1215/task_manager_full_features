@@ -1,9 +1,16 @@
 import { User } from "src/user/entities/user.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
-enum NotificationTypes{
-
+export enum NotificationTypes {
+  TASK_ASSIGNED = 'TASK_ASSIGNED',
+  USER_MENTIONED = 'USER_MENTIONED',
+  TASK_DUE_SOON = 'TASK_DUE_SOON', // 24 hours
+  TASK_OVERDUE = 'TASK_OVERDUE',
+  WORKSPACE_INVITATION = 'WORKSPACE_INVITATION',
+  WATCHED_TASK_COMMENT = 'WATCHED_TASK_COMMENT',,
+  TASK_UNASSIGNED= 'TASK_UNASSIGNED'
 }
+
 @Entity()
 export class Notification {
     @PrimaryGeneratedColumn('uuid')

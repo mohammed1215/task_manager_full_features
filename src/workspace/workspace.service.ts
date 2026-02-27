@@ -13,6 +13,7 @@ import { MailService } from 'src/mail/mail.service';
 import { Invitation } from './entities/invitation.entity';
 import { QueryRunner,DataSource } from 'typeorm';
 import { Activity, ActivityTypes } from 'src/activity/entities/activity.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 @Injectable()
 export class WorkspaceService {
   constructor(
@@ -23,6 +24,7 @@ export class WorkspaceService {
     private readonly dataSource:DataSource,
     private readonly mailService: MailService,
     private readonly userService:UserService,
+    private readonly eventEmitter:EventEmitter2
   ){}
   async create(userId:string,createWorkspaceDto: CreateWorkspaceDto) {
     //create slug
@@ -246,8 +248,17 @@ async removeWorkspace(userId:string,workspaceId:string, confirmation:string){
         })
 
         const savedInvitation = await queryRunner.manager.save(Invitation,invitation)
-        //send invitation email
-        const result= await this.mailService.sendInvitationEmail(user.email,workspace.name,savedInvitation.id,senderId)
+
+        //send notification
+        this.eventEmitter.emit('notification.send-invitation',{
+          userId: savedInvitation.invitedUser.id,
+          emailPreference:savedInvitation.invitedUser.emailPreference,
+          email:savedInvitation.invitedUser.email,
+          workspaceName:workspace.name,
+          invitationId: savedInvitation.id,
+          senderId: sender.id,
+        })
+        
         await queryRunner.commitTransaction()
         return {message:"sent invitation email successfully",invitation}
       } catch (error) {

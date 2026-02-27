@@ -42,6 +42,7 @@ import { Comment } from './comment/entities/comment.entity';
 import { Activity } from './activity/entities/activity.entity';
 import { Attachment } from './attachment/entities/attachment.entity';
 import { Notification } from './notification/entities/notification.entity';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 @Module({
   imports: [UserModule ,forwardRef(()=>WorkspaceModule), WorkspaceMemberModule,ConfigModule.forRoot({
     isGlobal:true
@@ -129,7 +130,8 @@ import { Notification } from './notification/entities/notification.entity';
   NotificationModule,
   TaskAssigneeModule,
   TaskTagsModule,
-  TaskWatcherModule
+  TaskWatcherModule,
+  EventEmitterModule.forRoot()
 ],
   controllers: [AppController],
   providers: [AppService,{

@@ -18,6 +18,7 @@ import { User } from 'src/user/entities/user.entity';
 import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.entity';
 import { MoveTaskDto } from './entities/move-task.dto';
 import { WorkspaceMemberRoles } from 'src/workspace-member/enum/WorkspaceMember.enum';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 export interface FILTER {
   columnId:string|undefined,
   assigneeId:string|undefined,
@@ -38,8 +39,9 @@ export class TaskService {
     @InjectRepository(TaskWatcher) private readonly taskWatcherRepo:Repository<TaskWatcher>,
     @InjectRepository(BoardMember) private readonly boardMemberRepo:Repository<BoardMember>,
     @InjectRepository(WorkspaceMember) private readonly workspaceMemberRepo:Repository<WorkspaceMember>,
-    private readonly mailService:MailService,
-    @InjectRepository(User) private readonly userRepo: Repository<User>
+    // private readonly mailService:MailService,
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
+    private readonly eventEmitter:EventEmitter2,
   ){}
   
   
@@ -304,7 +306,7 @@ export class TaskService {
 
     // email notification
     const userIds = insertedResult.raw.map(row=>row.userId)
-    let users;
+    let users:User[];
     if(userIds.length>0){
 
       // get emails
@@ -314,9 +316,15 @@ export class TaskService {
         }
       })
       
-      let emails = users.map(user=>user.email)
-      // send mails
-      this.mailService.sendAssigneeEmailNotification(emails)
+      for (const user of users) {
+        // send notifications
+        this.eventEmitter.emit('notification.task_assigned',{userId:user.id,
+          email:user.email,
+          emailPreference: user.emailPreference,
+          taskTitle:task.title,
+          taskId:task.id
+        })
+      }
     }
 
     const finalAssignees = await this.taskAssigneeRepo.find({
@@ -332,7 +340,7 @@ export class TaskService {
 
   async unassignTask(requestingUserId: string, taskId: string, userToUnassignId: string) {
     // Check if task exists and load relations (board)
-    const task = await this.taskRepo.findOne({where:{id:taskId},relations:['board']})
+    const task = await this.taskRepo.findOne({where:{id:taskId},relations:['board','assignedTasks','assignedTasks.user']})
     if(!task) throw new NotFoundException('task not found')
 
     // Authorize user role to be Member+
@@ -355,8 +363,26 @@ export class TaskService {
     // Delete user from taskAssignee table
     const deleteResult = await this.taskAssigneeRepo.delete({task:{id:taskId},user:{id:userToUnassignId}})
     
-    // Notify the user (The missing piece!)
-    this.mailService.sendUnassignEmailNotification(taskAssignee.user.email)
+    // Notify the user
+    this.eventEmitter.emit('notification.task_unassigned',{
+      userId:userToUnassignId,
+      taskId,
+      taskTitle:task.title,
+      emailPreference:taskAssignee.user.emailPreference,
+      email:taskAssignee.user.email,
+    })
+    //fetch other
+    //Notify other users
+    for (const assignee of task.assignedTasks) {
+      this.eventEmitter.emit('notification.task_unassigned',{
+      userId:assignee.user.id,
+      taskId,
+      taskTitle:task.title,
+      emailPreference:taskAssignee.user.emailPreference,
+      email:taskAssignee.user.email,
+      username: assignee.user.firstname +' '+ assignee.user.lastname
+    })
+    }
     // Return success response
     return {message:"unassigned user to the task successfully"}
   }
@@ -461,5 +487,16 @@ export class TaskService {
     
     // 6. LOG ACTIVITY & NOTIFY WATCHERS
     return {message:"task moved successfully"}
+  }
+
+  findAllWithoutConditions(){
+    const tomorrow = new Date().getTime() + 24 * 60 * 60 * 1000;
+    // const dayAfterTomorrow = tomorrow + 24 * 60 * 60 * 1000;
+    
+    return this.taskAssigneeRepo.find({
+      where: {
+        task: {dueDate:Between(new Date(), new Date(tomorrow))}
+      }
+    ,relations:['task','user','task.board']})
   }
 }
