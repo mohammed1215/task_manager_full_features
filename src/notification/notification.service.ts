@@ -37,7 +37,7 @@ export class NotificationService {
     //send count of notification
     const notificationCount2 = await this.notificationRepo.count({where:{user:{id:userId},isRead:false}})
     
-    this.gateway.sendToUser(userId,'unread-count',notificationCount2)
+    this.gateway.sendToUser(userId,'unread_count',notificationCount2)
     return savedNotification
   }
 
@@ -73,8 +73,6 @@ export class NotificationService {
     const result = await this.notificationRepo.update({isRead:false,createdAt: LessThan(sevenDaysAgo) },{isRead:true})
     console.log('Automatically marked 7-day old notifications as read. Number of affected rows '+result.affected);
   }
-
- 
 
   update(id: number, updateNotificationDto: UpdateNotificationDto) {
     return `This action updates a #${id} notification`;

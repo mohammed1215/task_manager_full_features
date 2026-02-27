@@ -3,7 +3,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PriorityTask, Task } from './entities/task.entity';
-import { Between, DeepPartial, FindOptionsOrder, FindOptionsWhere, ILike, In, LessThanOrEqual, Like, MoreThanOrEqual, Not, Repository } from 'typeorm';
+import { Between, DeepPartial, FindOptionsOrder, FindOptionsWhere, ILike, In, LessThan, LessThanOrEqual, Like, MoreThanOrEqual, Not, Repository } from 'typeorm';
 import { TaskAssignee } from 'src/task-assignee/entities/task-assignee.entity';
 import { ColumnEntity } from 'src/column/entities/column.entity';
 import { Tag } from 'src/tag/entities/tag.entity';
@@ -496,6 +496,14 @@ export class TaskService {
     return this.taskAssigneeRepo.find({
       where: {
         task: {dueDate:Between(new Date(), new Date(tomorrow))}
+      }
+    ,relations:['task','user','task.board']})
+  }
+
+  findOverdueTasks(){
+    return this.taskAssigneeRepo.find({
+      where: {
+        task:{dueDate:LessThan(new Date())}
       }
     ,relations:['task','user','task.board']})
   }

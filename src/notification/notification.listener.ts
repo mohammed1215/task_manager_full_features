@@ -115,4 +115,24 @@ export class NotificationListener{
             await this.mailService.sendInvitationEmail(payload.email,payload.workspaceName,payload.invitationId,payload.senderId)
         }
     }
+
+    @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+    async autoSendNotificationForOverDueTasks(){
+        const taskAssignees = await this.taskService.findOverdueTasks()
+
+        for (const assignee of taskAssignees) {
+            await this.notificationService.create(assignee.user.id,{
+                type: NotificationTypes.TASK_DUE_SOON,
+                title: 'Task Due Tomorrow',
+                linkUrl: `/tasks/${assignee.task.id}`,
+                message: `task ${assignee.task.title} due is tomorrow`,
+            })        
+
+            // email preferences
+            if(assignee.user.emailPreference === EmailPreference.IMMEDIATE){
+                await this.mailService.sendDueTaskNotification(assignee.user.email)
+            }
+        }
+    }
+
 }
