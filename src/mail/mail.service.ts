@@ -157,4 +157,32 @@ export class MailService {
         if(result.rejected.length >0) console.log(`couldn't send unassign email notification to user please try again later`)
         return result
     }
+
+    async sendOverDueTaskNotification(email:string){
+        const result = await this.mailService.sendMail({
+           from: `Task_Manager<${this.config.get('MAIL_USER')}>`,
+            to: email,
+            subject: `Task Due Soon`,
+            html: `
+            <div>
+                due task tomorrow
+            </div>
+            `
+        })
+        if(result.rejected.length >0) console.log(`couldn't send unassign email notification to user please try again later`)
+        return result
+    }
+
+    async sendWatchEmail(email:string){
+        const result = await this.mailService.sendMail({
+            from: `Task_Manager<${this.config.get('MAIL_USER')}>`,
+            to: email,
+            subject: `Task watch comment`,
+            html: `
+            <div>
+                comment has been added
+            </div>
+            `
+        })
+    }
 }

@@ -122,7 +122,7 @@ export class NotificationListener{
 
         for (const assignee of taskAssignees) {
             await this.notificationService.create(assignee.user.id,{
-                type: NotificationTypes.TASK_DUE_SOON,
+                type: NotificationTypes.TASK_OVERDUE,
                 title: 'Task Due Tomorrow',
                 linkUrl: `/tasks/${assignee.task.id}`,
                 message: `task ${assignee.task.title} due is tomorrow`,
@@ -130,8 +130,23 @@ export class NotificationListener{
 
             // email preferences
             if(assignee.user.emailPreference === EmailPreference.IMMEDIATE){
-                await this.mailService.sendDueTaskNotification(assignee.user.email)
+                await this.mailService.sendOverDueTaskNotification(assignee.user.email)
             }
+        }
+    }
+
+    @OnEvent('notification.watched_task_comment')
+    async handleCommentNotificationWatcher(payload:any){
+        await this.notificationService.create(payload.userId,{
+           type: NotificationTypes.WATCHED_TASK_COMMENT,
+            title: 'Comment added to task',
+            linkUrl: `/tasks/${payload.taskId}`,
+            message: `task ${payload.taskTitle} due is tomorrow`, 
+        })
+
+        // email preferences
+        if(payload.emailPreference === EmailPreference.IMMEDIATE){
+            await this.mailService.sendWatchEmail(payload.email)
         }
     }
 

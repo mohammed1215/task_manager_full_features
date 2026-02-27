@@ -10,6 +10,8 @@ import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.
 import { Board } from 'src/board/entities/board.entity';
 import { BoardMember } from 'src/board/entities/board-member.entity';
 import { WorkspaceMemberRoles } from 'src/workspace-member/enum/WorkspaceMember.enum';
+import { TaskWatcher } from 'src/task-watcher/entities/task-watcher.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class CommentService {
@@ -18,7 +20,9 @@ export class CommentService {
     @InjectRepository(Task) private readonly taskRepo:Repository<Task>,
     @InjectRepository(BoardMember) private readonly boardRepo:Repository<BoardMember>,
     private readonly boardService:BoardService,
-    @InjectRepository(WorkspaceMember) private readonly workMemberRepo:Repository<WorkspaceMember>
+    @InjectRepository(WorkspaceMember) private readonly workMemberRepo:Repository<WorkspaceMember>,
+    @InjectRepository(TaskWatcher) private readonly taskWatcherRepo:Repository<TaskWatcher>,
+    private readonly eventEmitter:EventEmitter2
   ){}
   
   // TODO: Comment supports plain text and mentions (@username)
@@ -63,7 +67,22 @@ export class CommentService {
     const savedComment = this.commentRepo.save(comment)
 
     // TODO: send notification for mentioned users
-    
+
+
+    //TODO: send notification for watchers
+    const watchers = await this.taskWatcherRepo.find({
+      where:{
+        task: {id: taskId},
+      }
+    })
+
+    for (const watcher of watchers) {
+      if(watcher.user.id !== userId){
+        this.eventEmitter.emit('notification.watched_task_comment',{userId:watcher.user.id,taskId,taskTitle:task.title})
+      }
+      
+    }
+
     return savedComment;
   }
 
