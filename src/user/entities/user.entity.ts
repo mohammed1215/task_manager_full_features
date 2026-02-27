@@ -1,4 +1,11 @@
 import { Exclude } from 'class-transformer';
+import { Activity } from 'src/activity/entities/activity.entity';
+import { Attachment } from 'src/attachment/entities/attachment.entity';
+import { BoardMember } from 'src/board/entities/board-member.entity';
+import { Comment } from 'src/comment/entities/comment.entity';
+import { TaskAssignee } from 'src/task-assignee/entities/task-assignee.entity';
+import { TaskWatcher } from 'src/task-watcher/entities/task-watcher.entity';
+import { Task } from 'src/task/entities/task.entity';
 import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.entity';
 import { Invitation } from 'src/workspace/entities/invitation.entity';
 import { Workspace } from 'src/workspace/entities/workspace.entity';
@@ -57,4 +64,31 @@ export class User {
 
     @OneToMany(()=> Invitation,(invitation)=>invitation.invitedUser)
     receivedInvitation:Invitation[];
+
+    @OneToMany(()=>BoardMember,(boardMember)=>boardMember.user)
+    boardMembership: BoardMember[]
+
+    @OneToMany(()=>BoardMember,(boardMember)=>boardMember.invitedBy)
+    sentBoardInvitations: BoardMember[]
+
+    @OneToMany(()=>Task,(task)=>task.createdBy)
+    createdTasks:Task[];
+
+    @OneToMany(()=>TaskAssignee,(task)=>task.user)
+    assignedTasks: TaskAssignee[]
+
+    @OneToMany(()=>TaskAssignee,(task)=>task.assignedBy)
+    assigningTasks: TaskAssignee[]
+
+    @OneToMany(()=>TaskWatcher,(task)=>task.user)
+    watchedTasks:TaskWatcher[]
+
+    @OneToMany(()=>Comment,(comment)=>comment.author)
+    comments: Comment[]
+
+    @OneToMany(()=>Activity,activity=>activity.actor)
+    activities:Activity[]
+
+    @OneToMany(()=>Attachment,attachment=>attachment.uploadedBy)
+    attachments:Attachment[]
 }

@@ -57,3 +57,9 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # uploads
 upload
+
+# build one file
+dist-single
+nestjs-server
+*.exe
+sea-config.json

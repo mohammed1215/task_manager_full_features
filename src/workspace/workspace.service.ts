@@ -12,12 +12,14 @@ import { UserService } from 'src/user/user.service';
 import { MailService } from 'src/mail/mail.service';
 import { Invitation } from './entities/invitation.entity';
 import { QueryRunner,DataSource } from 'typeorm';
+import { Activity, ActivityTypes } from 'src/activity/entities/activity.entity';
 @Injectable()
 export class WorkspaceService {
   constructor(
     @InjectRepository(Workspace) private readonly workspaceRepo:Repository<Workspace>,
     @InjectRepository(WorkspaceMember) private readonly workspaceMemberRepo:Repository<WorkspaceMember>,
     @InjectRepository(Invitation) private readonly invitationRepo:Repository<Invitation>,
+    @InjectRepository(Activity) private readonly activityRepo:Repository<Activity>,
     private readonly dataSource:DataSource,
     private readonly mailService: MailService,
     private readonly userService:UserService,
@@ -98,25 +100,48 @@ export class WorkspaceService {
     return workspace
   }
 
-  async update(workspaceId: string, updateWorkspaceDto: UpdateWorkspaceDto) {
-    if(updateWorkspaceDto.name){
-      updateWorkspaceDto.slug = slugify(updateWorkspaceDto.name,{lower:true})
+  async update(userId:string,workspaceId: string, updateWorkspaceDto: UpdateWorkspaceDto) {
+    const dbPayload:any = {...updateWorkspaceDto}
+    if(updateWorkspaceDto?.name){
+      dbPayload.slug = slugify(updateWorkspaceDto.name,{lower:true})
     }
 
-    const updateResult = await this.workspaceRepo.update({id: workspaceId},{...updateWorkspaceDto})
+    const member = await this.workspaceMemberRepo.findOne({where:{workspace:{id:workspaceId},user:{id:userId}}})
+    if(!member) throw new NotFoundException('member not found')
+
+      if(member.role !== WorkspaceMemberRoles.owner&& member.role !== WorkspaceMemberRoles.admin){
+        throw new ForbiddenException('Not Allowed Privilages: Owner is the one allowed to update the workspace')
+      }
+    
+    const updateResult = await this.workspaceRepo.update({id: workspaceId},{...dbPayload})
     if(!updateResult.affected) throw new NotFoundException("workspace not found")
+    
+    // activity
+    // const activity = this.activityRepo.create({activityType:ActivityTypes.updated,fieldName:'update workspace details',actor:{id:userId},task:})
+    // this.activityRepo.save(activity)
     return {message:"workspace has been updated successfully"};
   }
 
-async removeWorkspace(userId:string,workspaceId:string, workspaceName:string){
-  if(!workspaceName) throw new BadRequestException('Please Confirm Deletion')
+async removeWorkspace(userId:string,workspaceId:string, confirmation:string){
+  if(!confirmation) throw new BadRequestException('Please Confirm Deletion')
 
   const member =await this.workspaceMemberRepo.findOne({where: {user:{id:userId},workspace:{id:workspaceId}}})
   if(!member) throw new NotFoundException('member not found in the workspace');
 
   if(member.role !== WorkspaceMemberRoles.owner) throw new ForbiddenException('Not Allowed Privilages: Owner is the only one allowed to delete the workspace')
-    const result = await this.workspaceRepo.delete({id:workspaceId})
+  const workspace = await this.findOne(workspaceId);
+
+  if(confirmation!== workspace.name) throw new BadRequestException('Please write the workspace name correctly')
+    
+  const result = await this.workspaceRepo.delete({id:workspaceId})
+  
   if(!result.affected) throw new NotFoundException('workspace not found')
+  const members = await this.workspaceMemberRepo.find({where: {workspace:{id:workspaceId}},relations:['user']})
+
+  for (const member of members) {
+    await this.mailService.sendNotifyDeletionEmail(member.user.email,confirmation)
+  }
+
     return {message:"workspace has been deleted successfully"}
 }
 
@@ -126,7 +151,8 @@ async removeWorkspace(userId:string,workspaceId:string, workspaceName:string){
         workspace:{
           id: workspaceId
         }
-      }
+      },
+      relations:['user']
     })
   }
 

@@ -32,8 +32,10 @@ export class WorkspaceController {
 
   @Patch(':workspaceId')
   @UseGuards(JwtGuard)
-  update(@User() user:jwtPayload,updateWorkspaceDto:UpdateWorkspaceDto){
-    this.workspaceService.update(user.userId,updateWorkspaceDto)
+  update(@User() user:jwtPayload,
+  @Param('workspaceId') workspaceId:string,
+  @Body() updateWorkspaceDto:UpdateWorkspaceDto){
+   return this.workspaceService.update(user.userId,workspaceId,updateWorkspaceDto)
   }
 
   @Delete(':workspaceId')
@@ -41,9 +43,9 @@ export class WorkspaceController {
   removeWorkspace(
     @Param('workspaceId') workspaceId:string,
     @User() user:jwtPayload,
-    @Body('workspaceName') workspaceName:string
+    @Body('confirmation') confirmation:string
   ){
-    return this.workspaceService.removeWorkspace(user.userId,workspaceId,workspaceName)
+    return this.workspaceService.removeWorkspace(user.userId,workspaceId,confirmation)
   }
   
 

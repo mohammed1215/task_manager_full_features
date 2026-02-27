@@ -7,12 +7,13 @@ import { AuthModule } from 'src/auth/auth.module';
 import { MulterModule } from '@nestjs/platform-express';
 import multer from 'multer';
 import { existsSync, mkdirSync } from 'fs';
+import { Activity } from 'src/activity/entities/activity.entity';
 
 @Module({
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],
-  imports: [TypeOrmModule.forFeature([User]),forwardRef(()=>AuthModule),  MulterModule.register({
+  imports: [TypeOrmModule.forFeature([User,Activity]),forwardRef(()=>AuthModule),  MulterModule.register({
     storage: multer.diskStorage({
       destination(req, file, callback) {
         console.log('📂 Target Destination: ./upload');

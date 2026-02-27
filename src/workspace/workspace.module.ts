@@ -7,12 +7,13 @@ import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.
 import { UserModule } from 'src/user/user.module';
 import { AppModule } from 'src/app.module';
 import { Invitation } from './entities/invitation.entity';
+import { Activity } from 'src/activity/entities/activity.entity';
 
 @Module({
   controllers: [WorkspaceController],
   providers: [WorkspaceService],
   imports:[
-  TypeOrmModule.forFeature([Workspace,WorkspaceMember,Invitation]),
+  TypeOrmModule.forFeature([Workspace,WorkspaceMember,Invitation,Activity]),
   UserModule,
   forwardRef(()=>AppModule)
 ]

@@ -82,5 +82,49 @@ export class MailService {
         if(result.rejected.length >0) throw new BadRequestException(`couldn't send invitation email please try again later`)
         return result
     }
+
+    async sendNotifyDeletionEmail(email:string,workspaceName:string){
+        const result = await this.mailService.sendMail({
+           from: `Task_Manager<${this.config.get('MAIL_USER')}>`,
+            to: email,
+            subject: `Deletion Workspace`,
+            html: `
+            <div>
+            ${workspaceName} has been deleted
+            </div>
+            `
+        })
+        if(result.rejected.length >0) throw new BadRequestException(`couldn't send invitation email please try again later`)
+        return result
+    }
         
+    async sendAssigneeEmailNotification(emails:string[]){
+        const result = await this.mailService.sendMail({
+           from: `Task_Manager<${this.config.get('MAIL_USER')}>`,
+            bcc: emails,
+            subject: `Task Assignment`,
+            html: `
+            <div>
+            You got assigned to new task
+            </div>
+            `
+        })
+        if(result.rejected.length >0) console.log(`couldn't send assignee email to users please try again later`)
+        return result
+    }
+
+    async sendUnassignEmailNotification(email:string){
+        const result = await this.mailService.sendMail({
+           from: `Task_Manager<${this.config.get('MAIL_USER')}>`,
+            to: email,
+            subject: `Task Unassignment`,
+            html: `
+            <div>
+            You got assigned to new task
+            </div>
+            `
+        })
+        if(result.rejected.length >0) console.log(`couldn't send unassign email notification to user please try again later`)
+        return result
+    }
 }

@@ -20,6 +20,28 @@ import { MulterModule } from '@nestjs/platform-express';
 import multer from 'multer';
 import { existsSync, mkdirSync } from 'fs';
 import { Invitation } from './workspace/entities/invitation.entity';
+import { BoardModule } from './board/board.module';
+import { ColumnModule } from './column/column.module';
+import { Board } from './board/entities/board.entity';
+import { ColumnEntity } from './column/entities/column.entity';
+import { BoardMember } from './board/entities/board-member.entity';
+import { TaskModule } from './task/task.module';
+import { Task } from './task/entities/task.entity';
+import { CommentModule } from './comment/comment.module';
+import { AttachmentModule } from './attachment/attachment.module';
+import { TagModule } from './tag/tag.module';
+import { ActivityModule } from './activity/activity.module';
+import { NotificationModule } from './notification/notification.module';
+import { TaskAssigneeModule } from './task-assignee/task-assignee.module';
+import { TaskTagsModule } from './task-tags/task-tags.module';
+import { TaskWatcherModule } from './task-watcher/task-watcher.module';
+import { Tag } from './tag/entities/tag.entity';
+import { TaskAssignee } from './task-assignee/entities/task-assignee.entity';
+import { TaskWatcher } from './task-watcher/entities/task-watcher.entity';
+import { Comment } from './comment/entities/comment.entity';
+import { Activity } from './activity/entities/activity.entity';
+import { Attachment } from './attachment/entities/attachment.entity';
+import { Notification } from './notification/entities/notification.entity';
 @Module({
   imports: [UserModule ,forwardRef(()=>WorkspaceModule), WorkspaceMemberModule,ConfigModule.forRoot({
     isGlobal:true
@@ -31,7 +53,7 @@ import { Invitation } from './workspace/entities/invitation.entity';
         type:'postgres',
         url: config.get<string>('DATABASE_CONNECTION_STRING'),
         synchronize:true,
-        entities: [User,Workspace,WorkspaceMember,Invitation]
+        entities: [User,Workspace,WorkspaceMember,Invitation,Board,ColumnEntity,BoardMember,Task,Tag,TaskAssignee,TaskWatcher,Comment,Activity,Attachment,Notification]
       }
     }
   }), 
@@ -96,7 +118,18 @@ import { Invitation } from './workspace/entities/invitation.entity';
       console.log('✅ Accepted: File is an image');
       callback(null,true)
     },
-  })
+  }),
+  BoardModule,
+  ColumnModule,
+  TaskModule,
+  CommentModule,
+  AttachmentModule,
+  TagModule,
+  ActivityModule,
+  NotificationModule,
+  TaskAssigneeModule,
+  TaskTagsModule,
+  TaskWatcherModule
 ],
   controllers: [AppController],
   providers: [AppService,{

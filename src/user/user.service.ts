@@ -8,10 +8,15 @@ import bcrypt from 'bcrypt'
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ConfigService } from '@nestjs/config';
 import fs from 'fs'
+import { Activity } from 'src/activity/entities/activity.entity';
 @Injectable()
 export class UserService {
 
-  constructor(@InjectRepository(User) private readonly userRepo:Repository<User>,private readonly config:ConfigService){}
+  constructor(
+    @InjectRepository(User) private readonly userRepo:Repository<User>,
+    private readonly config:ConfigService,
+    @InjectRepository(Activity) private readonly activityRepo:Repository<Activity>,
+  ){}
 
   async create(createUserDto: CreateUserDto) {
     // check if email exists or not
@@ -87,6 +92,16 @@ export class UserService {
     
     //if no affected data then user couldn't be found
     if(!result.affected) throw new NotFoundException('user not found')
+
+    //activity
+    const activity = this.activityRepo.create({
+      actor: {id: userId},
+      fieldName: 'updated user profile',
+      oldValue: JSON.stringify(user),
+      newValue: result.raw
+    })
+
+    await this.activityRepo.save(activity)
 
     //return updated successfully message
     return "updated profile data successfully"
