@@ -43,6 +43,7 @@ import { Activity } from './activity/entities/activity.entity';
 import { Attachment } from './attachment/entities/attachment.entity';
 import { Notification } from './notification/entities/notification.entity';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ScheduleModule } from '@nestjs/schedule';
 @Module({
   imports: [UserModule ,forwardRef(()=>WorkspaceModule), WorkspaceMemberModule,ConfigModule.forRoot({
     isGlobal:true
@@ -131,7 +132,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
   TaskAssigneeModule,
   TaskTagsModule,
   TaskWatcherModule,
-  EventEmitterModule.forRoot()
+  EventEmitterModule.forRoot(),
+  ScheduleModule.forRoot()
 ],
   controllers: [AppController],
   providers: [AppService,{

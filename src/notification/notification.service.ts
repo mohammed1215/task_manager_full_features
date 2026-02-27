@@ -3,7 +3,7 @@ import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notification, NotificationTypes } from './entities/notification.entity';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import { NotificationGateway } from './notification.gateway';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { TaskService } from 'src/task/task.service';
@@ -70,7 +70,7 @@ export class NotificationService {
   async autoMarkOldNotificationsAsRead() {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setTime(sevenDaysAgo.getTime() - 7 * 24 * 60 * 60 * 1000)
-    const result = await this.notificationRepo.update({isRead:false,createdAt: sevenDaysAgo },{isRead:true})
+    const result = await this.notificationRepo.update({isRead:false,createdAt: LessThan(sevenDaysAgo) },{isRead:true})
     console.log('Automatically marked 7-day old notifications as read. Number of affected rows '+result.affected);
   }
 
