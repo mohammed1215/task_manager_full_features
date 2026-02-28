@@ -6,14 +6,15 @@ import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { User } from 'src/user/decorator/user.decorator';
 import { type jwtPayload } from 'src/interface/jwt-payload.interface';
 @UseGuards(JwtGuard)
-@Controller({path:'controller',version:'1'})
+@Controller({path:'notifications',version:'1'})
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
   // POST /api/v1/notifications/mark-all-read
   @Post('mark-all-read')
-  markAllAsRead(@User() user:jwtPayload) {
-    return this.notificationService.markAllRead(user.userId);
+  async markAllAsRead(@User() user:jwtPayload) {
+    await this.notificationService.markAllRead(user.userId);
+    return { message: 'All notifications marked as read' }; 
   }
 
   @Get()
@@ -28,12 +29,13 @@ export class NotificationController {
 
   // PATCH /api/v1/notifications/{notification_id}/read
   @Patch(':notification_id/read')
-  markAsRead(@User() user:jwtPayload, @Param('notification_id') notificationId: string) {
-    return this.notificationService.markAsRead(user.userId, notificationId);
+  async markAsRead(@User() user:jwtPayload, @Param('notification_id') notificationId: string) {
+    await this.notificationService.markAsRead(user.userId, notificationId);
+    return { message: 'Notification marked as read' };
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.notificationService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.notificationService.remove(+id);
+  // }
 }

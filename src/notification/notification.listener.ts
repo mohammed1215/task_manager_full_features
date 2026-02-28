@@ -123,9 +123,9 @@ export class NotificationListener{
         for (const assignee of taskAssignees) {
             await this.notificationService.create(assignee.user.id,{
                 type: NotificationTypes.TASK_OVERDUE,
-                title: 'Task Due Tomorrow',
+                title: 'Task Overdue',
                 linkUrl: `/tasks/${assignee.task.id}`,
-                message: `task ${assignee.task.title} due is tomorrow`,
+                message: `task ${assignee.task.title} is overdue!`,
             })        
 
             // email preferences
@@ -141,7 +141,7 @@ export class NotificationListener{
            type: NotificationTypes.WATCHED_TASK_COMMENT,
             title: 'Comment added to task',
             linkUrl: `/tasks/${payload.taskId}`,
-            message: `task ${payload.taskTitle} due is tomorrow`, 
+            message: `Someone commented on a task you are watching: ${payload.taskTitle}`, 
         })
 
         // email preferences

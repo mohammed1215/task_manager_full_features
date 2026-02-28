@@ -73,12 +73,18 @@ export class CommentService {
     const watchers = await this.taskWatcherRepo.find({
       where:{
         task: {id: taskId},
-      }
+      },relations:['user']
     })
 
     for (const watcher of watchers) {
       if(watcher.user.id !== userId){
-        this.eventEmitter.emit('notification.watched_task_comment',{userId:watcher.user.id,taskId,taskTitle:task.title})
+        this.eventEmitter.emit('notification.watched_task_comment',{
+          userId:watcher.user.id,
+          taskId,
+          taskTitle:task.title,
+          email: watcher.user.email,
+          emailPreference:watcher.user.emailPreference
+        })
       }
       
     }

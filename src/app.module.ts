@@ -44,6 +44,7 @@ import { Attachment } from './attachment/entities/attachment.entity';
 import { Notification } from './notification/entities/notification.entity';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
+import { SearchModule } from './search/search.module';
 @Module({
   imports: [UserModule ,forwardRef(()=>WorkspaceModule), WorkspaceMemberModule,ConfigModule.forRoot({
     isGlobal:true
@@ -133,7 +134,8 @@ import { ScheduleModule } from '@nestjs/schedule';
   TaskTagsModule,
   TaskWatcherModule,
   EventEmitterModule.forRoot(),
-  ScheduleModule.forRoot()
+  ScheduleModule.forRoot(),
+  SearchModule
 ],
   controllers: [AppController],
   providers: [AppService,{
