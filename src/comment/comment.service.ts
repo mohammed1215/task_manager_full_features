@@ -107,9 +107,9 @@ export class CommentService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
-  }
+  // findOne(id: number) {
+  //   return `This action returns a #${id} comment`;
+  // }
 
   //TODO: MENTIONS
   async update(authorId:string,commentId:string,updateCommentDto:UpdateCommentDto) {

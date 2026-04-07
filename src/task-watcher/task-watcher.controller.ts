@@ -17,18 +17,18 @@ export class TaskWatcherController {
     return this.taskWatcherService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.taskWatcherService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.taskWatcherService.findOne(+id);
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTaskWatcherDto: UpdateTaskWatcherDto) {
-    return this.taskWatcherService.update(+id, updateTaskWatcherDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateTaskWatcherDto: UpdateTaskWatcherDto) {
+  //   return this.taskWatcherService.update(+id, updateTaskWatcherDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.taskWatcherService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.taskWatcherService.remove(+id);
+  // }
 }

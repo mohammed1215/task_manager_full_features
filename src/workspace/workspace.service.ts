@@ -86,6 +86,7 @@ export class WorkspaceService {
     const [workspaces,count]= await this.workspaceRepo.findAndCount({
       where:query,
       take:limit,
+      relations: ['owner','boards','members','members.user'],
       skip: (page - 1) * limit
     });
 

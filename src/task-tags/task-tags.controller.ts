@@ -17,18 +17,18 @@ export class TaskTagsController {
     return this.taskTagsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.taskTagsService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.taskTagsService.findOne(+id);
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTaskTagDto: UpdateTaskTagDto) {
-    return this.taskTagsService.update(+id, updateTaskTagDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateTaskTagDto: UpdateTaskTagDto) {
+  //   return this.taskTagsService.update(+id, updateTaskTagDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.taskTagsService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.taskTagsService.remove(+id);
+  // }
 }

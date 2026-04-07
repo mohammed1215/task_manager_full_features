@@ -11,6 +11,7 @@ import { Task } from 'src/task/entities/task.entity';
 import { BoardMember } from 'src/board/entities/board-member.entity';
 import { Activity } from 'src/activity/entities/activity.entity';
 import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.entity';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 @Module({
   controllers: [AttachmentController],
   providers: [AttachmentService],
@@ -44,6 +45,9 @@ import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.
       callback(null,true)
     },
 
-  }),TypeOrmModule.forFeature([Attachment,Task,BoardMember,Activity,WorkspaceMember])]
+  }),
+  TypeOrmModule.forFeature([Attachment,Task,BoardMember,Activity,WorkspaceMember]),
+  CloudinaryModule,
+]
 })
 export class AttachmentModule {}

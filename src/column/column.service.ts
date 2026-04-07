@@ -38,14 +38,24 @@ export class ColumnService {
     return this.columnRepo.save(column)
   }
 
-  findAll() {
-    return `This action returns all column`;
+  async findAll(userId:string, boardId:string) {
+    await this.boardService.findOneBoardMember(userId,boardId)
+       
+    return this.columnRepo.find({
+    where:{
+        board:{id:boardId}
+    },order:{
+    position: 'ASC',
+    tasksInsideColumn:{
+    position: 'ASC'
+}
+},relations:['board','tasksInsideColumn','tasksInsideColumn.assignedTasks']});
   }
-
-  findOne(id: number) {
-    return `This action returns a #${id} column`;
-  }
-
+//
+//  findOne(id: number) {
+//    return `This action returns a #${id} column`;
+//  }
+//
   async update(boardId: string,columnId:string,userId:string, updateColumnDto: UpdateColumnDto) {
     //check if user is member of columns
     const boardMember = await this.boardService.findOneBoardMember(userId,boardId)

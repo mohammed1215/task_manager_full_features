@@ -19,7 +19,7 @@ export class SearchService {
       where: { user: { id: userId } },
       relations: ['workspace'],
     });
-
+    console.log(searchQueryDto)
     const allowedWorkspaceIds = userMemberships.map(m=>m.workspace.id)
 
     if(workspaceId && !allowedWorkspaceIds.includes(workspaceId)){
@@ -44,7 +44,7 @@ export class SearchService {
           { description: ILike(`%${q}%`), board: { workspace: { id: In(targetWorkspaceIds) } } },
           { comment: { content: ILike(`%${q}%`) }, board: { workspace: { id: In(targetWorkspaceIds) } } } 
         ],
-        relations: ['board', 'board.workspace'], 
+        relations: ['board', 'board.workspace','column'], 
         take: type === SearchTypes.ALL ? Math.floor(limit / 2) : limit,
         skip: (page - 1) * limit,
       });
@@ -74,7 +74,9 @@ export class SearchService {
       title: task.title,
       snippet: task.description?.substring(0, 60) || 'No description...',
       boardName: task.board.name,
-      workspaceName: task.board.workspace.name
+      workspaceName: task.board.workspace.name,
+      column: task.column,
+      priority: task.priority
     }));
 
     const finalBoards = boards.map(board => ({

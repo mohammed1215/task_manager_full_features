@@ -45,6 +45,7 @@ import { Notification } from './notification/entities/notification.entity';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SearchModule } from './search/search.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 @Module({
   imports: [UserModule ,forwardRef(()=>WorkspaceModule), WorkspaceMemberModule,ConfigModule.forRoot({
     isGlobal:true
@@ -135,7 +136,8 @@ import { SearchModule } from './search/search.module';
   TaskWatcherModule,
   EventEmitterModule.forRoot(),
   ScheduleModule.forRoot(),
-  SearchModule
+  SearchModule,
+  CloudinaryModule
 ],
   controllers: [AppController],
   providers: [AppService,{

@@ -148,12 +148,21 @@ export class TaskService {
   async findOne(userId:string,taskId: string) {
     const task = await this.taskRepo.findOne({where:{id:taskId},relations:{
       board:{
-        workspace:true
+        workspace:true,
+        members:{
+            user:true        
+        },
       },
-      assignedTasks:true,
+comment:{
+    author: true
+},
+      assignedTasks:{
+        user: true
+    },
       column:true,
       watchers:true,
-      createdBy:true
+      createdBy:true,
+    attachments:true
     }})
     if(!task) throw new NotFoundException('task not found')
     const boardMember = await this.boardService.findOneBoardMember(userId,task.board.id)
@@ -254,7 +263,8 @@ export class TaskService {
     if(!task) throw new NotFoundException('task not found')
 
     const boardMember = await this.boardService.findOneBoardMember(userId,task.board.id)
-    let values = assignUsersToTaskDto.assigneeIds.map(id=>({
+    console.log(assignUsersToTaskDto.assigneeIds)
+    let values = assignUsersToTaskDto.assigneeIds?.map(id=>({
       assignedBy: userId,
       task: {id:taskId},
       user: {id}
@@ -277,6 +287,7 @@ export class TaskService {
     }
 
     // if user exists
+
     const insertedResult = await this.taskAssigneeRepo.createQueryBuilder('task_assignee')
     .insert()
     .into('task_assignee')
@@ -285,8 +296,9 @@ export class TaskService {
     .returning('*')
     .execute()
 
+
     // map assignees to watchers
-    let watcherList = assignUsersToTaskDto.assigneeIds.map<DeepPartial<TaskWatcher>>(assigneeId=>{
+    let watcherList = assignUsersToTaskDto.assigneeIds?.map<DeepPartial<TaskWatcher>>(assigneeId=>{
       return ({
         task: {id:taskId},
         user: {id:assigneeId},
@@ -305,7 +317,7 @@ export class TaskService {
     .execute()
 
     // email notification
-    const userIds = insertedResult.raw.map(row=>row.userId)
+    const userIds = insertedResult.raw?.map(row=>row.userId)
     let users:User[];
     if(userIds.length>0){
 

@@ -47,7 +47,7 @@ export class Board {
     @ManyToOne(()=>User,{onDelete:'CASCADE'})
     createdBy:User;
     
-    @ManyToOne(()=>Workspace,{onDelete:'CASCADE'})
+    @ManyToOne(()=>Workspace,(workspace)=>workspace.boards,{onDelete:'CASCADE'})
     workspace:Workspace;
 
     @OneToMany(()=>ColumnEntity,(column)=>column.board)

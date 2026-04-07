@@ -10,7 +10,10 @@ import { BoardService } from 'src/board/board.service';
 import { UpdateBoardDto } from 'src/board/dto/update-board.dto';
 import { TaskService } from 'src/task/task.service';
 import { CreateTaskDto } from 'src/task/dto/create-task.dto';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 
+@ApiTags('Columns & Boards Management')
+@ApiBearerAuth()
 @Controller('boards')
 export class ColumnController {
   constructor(
@@ -21,6 +24,11 @@ export class ColumnController {
 
   @Post(':boardId/columns')
   @UseGuards(JwtGuard)
+  @ApiOperation({ summary: 'Create new column', description: 'Create a new column in a board' })
+  @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
+  @ApiResponse({ status: 201, description: 'Column created successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiBody({ type: CreateColumnDto })
   create(
     @User() user:jwtPayload,
     @Param('boardId') boardId:string,
@@ -29,10 +37,18 @@ export class ColumnController {
     return this.columnService.create(user.userId,boardId,createColumnDto);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.columnService.findAll();
-  // }
+@Get(':boardId/columns')
+@UseGuards(JwtGuard)
+@ApiOperation({ summary: 'Get all columns in board', description: 'Retrieve all columns for a specific board' })
+@ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
+@ApiResponse({ status: 200, description: 'Columns retrieved successfully' })
+@ApiResponse({ status: 401, description: 'Unauthorized' })
+ findAll(
+    @Param('boardId') boardId:string,
+    @User() user:jwtPayload,    
+) {
+   return this.columnService.findAll(user.userId,boardId);
+ }
 
   // @Get(':id')
   // findOne(@Param('id') id: string) {
@@ -41,6 +57,10 @@ export class ColumnController {
 
   @Post(':boardId/tasks')
   @UseGuards(JwtGuard)
+  @ApiOperation({ summary: 'Create task in board', description: 'Create a new task directly in a board' })
+  @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
+  @ApiResponse({ status: 201, description: 'Task created successfully' })
+  @ApiBody({ type: CreateTaskDto })
   createTasks(
     @User() user:jwtPayload,
     @Param('boardId') boardId:string,
@@ -51,6 +71,9 @@ export class ColumnController {
 
   @Post(':boardId/archive')
   @UseGuards(JwtGuard)
+  @ApiOperation({ summary: 'Archive board', description: 'Archive a board to hide it from active boards' })
+  @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
+  @ApiResponse({ status: 200, description: 'Board archived successfully' })
   archiveBoard(
     @User() user:jwtPayload,
     @Param('boardId') boardId:string,
@@ -60,6 +83,9 @@ export class ColumnController {
 
   @Post(':boardId/restore')
   @UseGuards(JwtGuard)
+  @ApiOperation({ summary: 'Restore archived board', description: 'Restore an archived board back to active' })
+  @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
+  @ApiResponse({ status: 200, description: 'Board restored successfully' })
   restoreBoard(
     @User() user:jwtPayload,
     @Param('boardId') boardId:string,
@@ -68,6 +94,10 @@ export class ColumnController {
   }
   @Patch(':boardId')
   @UseGuards(JwtGuard)
+  @ApiOperation({ summary: 'Update board', description: 'Update board information' })
+  @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
+  @ApiResponse({ status: 200, description: 'Board updated successfully' })
+  @ApiBody({ type: UpdateBoardDto })
   updateBoard(
     @Param('boardId') boardId: string, @Body() updateBoardDto: UpdateBoardDto,
     @User() user:jwtPayload
@@ -77,6 +107,9 @@ export class ColumnController {
 
   @Delete(':boardId')
   @UseGuards(JwtGuard)
+  @ApiOperation({ summary: 'Delete board', description: 'Remove a board permanently' })
+  @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
+  @ApiResponse({ status: 200, description: 'Board deleted successfully' })
   removeBoard(
     @Param('boardId') boardId: string,
     @User() user:jwtPayload,
@@ -87,6 +120,11 @@ export class ColumnController {
 
   @Patch(':boardId/columns/:columnId')
   @UseGuards(JwtGuard)
+  @ApiOperation({ summary: 'Update column', description: 'Update column information' })
+  @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
+  @ApiParam({ name: 'columnId', type: 'string', description: 'Column UUID' })
+  @ApiResponse({ status: 200, description: 'Column updated successfully' })
+  @ApiBody({ type: UpdateColumnDto })
   update(
     @Param('boardId') boardId: string,
     @Param('columnId') columnId:string,
@@ -98,6 +136,10 @@ export class ColumnController {
 
   @Put(':boardId/columns/reorder')
   @UseGuards(JwtGuard)
+  @ApiOperation({ summary: 'Reorder columns', description: 'Change the order of columns in a board' })
+  @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
+  @ApiResponse({ status: 200, description: 'Columns reordered successfully' })
+  @ApiBody({ type: ReOrderColumnDto })
   reOrderColumn(
     @Param('boardId') boardId:string,
     @Body() reOrderColumnDto:ReOrderColumnDto,
@@ -108,6 +150,10 @@ export class ColumnController {
 
   @Delete(':boardId/columns/:columnId')
   @UseGuards(JwtGuard)
+  @ApiOperation({ summary: 'Delete column', description: 'Remove a column from a board' })
+  @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
+  @ApiParam({ name: 'columnId', type: 'string', description: 'Column UUID' })
+  @ApiResponse({ status: 200, description: 'Column deleted successfully' })
   remove(
     @Param('boardId') boardId: string,
     @Param('columnId') columnId: string,

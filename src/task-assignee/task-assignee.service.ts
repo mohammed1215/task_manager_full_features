@@ -12,9 +12,9 @@ export class TaskAssigneeService {
     return `This action returns all taskAssignee`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} taskAssignee`;
-  }
+  // findOne(id: number) {
+  //   return `This action returns a #${id} taskAssignee`;
+  // }
 
   update(id: number, updateTaskAssigneeDto: UpdateTaskAssigneeDto) {
     return `This action updates a #${id} taskAssignee`;

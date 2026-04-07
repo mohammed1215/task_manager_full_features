@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe({forbidNonWhitelisted:true,whitelist:true,transform:true}))
   app.setGlobalPrefix('/api/v1/')
-  
+  app.enableCors({origin: ['*',process.env.FRONTEND_URL,'http://localhost:5173']})
   const config = new DocumentBuilder()
     .setTitle('TaskFlow API')
     .setDescription('The Task Management System API documentation')
@@ -18,6 +18,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document); // The URL where the
 
-  await app.listen(process.env.PORT ?? 3001);
+  const port = process.env.PORT || 3001;
+  await app.listen(port, '0.0.0.0');
+  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

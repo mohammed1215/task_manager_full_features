@@ -12,9 +12,9 @@ export class TaskTagsService {
     return `This action returns all taskTags`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} taskTag`;
-  }
+  // findOne(id: number) {
+  //   return `This action returns a #${id} taskTag`;
+  // }
 
   update(id: number, updateTaskTagDto: UpdateTaskTagDto) {
     return `This action updates a #${id} taskTag`;

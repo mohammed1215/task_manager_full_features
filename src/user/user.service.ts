@@ -9,6 +9,9 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ConfigService } from '@nestjs/config';
 import fs from 'fs'
 import { Activity } from 'src/activity/entities/activity.entity';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { unlink } from 'fs/promises';
+
 @Injectable()
 export class UserService {
 
@@ -16,6 +19,7 @@ export class UserService {
     @InjectRepository(User) private readonly userRepo:Repository<User>,
     private readonly config:ConfigService,
     @InjectRepository(Activity) private readonly activityRepo:Repository<Activity>,
+    private readonly cloudinaryService:CloudinaryService
   ){}
 
   async create(createUserDto: CreateUserDto) {
@@ -108,40 +112,75 @@ export class UserService {
   }
 
   async uploadAvatar(userId:string,file:Express.Multer.File){
-    // check if file exists or not
-    if(!file){
-      throw new BadRequestException('avatar is required')
+    let newProfileUrl:string;
+    try {
+        
+      // check if file exists or not
+      if(!file){
+        throw new BadRequestException('avatar is required')
+      }
+        
+      //get old url
+      let user = await this.findOne(userId)
+      const oldUrl = user.avatarUrl
+
+      //delete the file
+      if(oldUrl){
+        await this.deleteOldImage(oldUrl)
+      }
+
+      if(this.cloudinaryService.isCloudinaryEnabled()){
+        const result = await this.cloudinaryService.upload(file)
+        newProfileUrl = result.url
+      }else{
+        newProfileUrl=`${this.config.get<string>('BACKEND_URL')}/images/${file?.filename}`
+      }
+      
+      
+      // save new user avatar Url
+      user = await this.userRepo.save({...user, avatarUrl: newProfileUrl})
+
+      //return updated successfully message
+      return {message:"updated profile avatar successfully",user}
+    } catch (error) {
+      if (file?.path && fs.existsSync(file.path)) {
+        await this.deleteLocalFile(file.path);
+      }
+      throw error;
     }
-
-    //get old url
-    let user = await this.findOne(userId)
-    const oldUrl = user.avatarUrl
-
-     // delete the file
-    await this.deleteOldImage(`./upload/${oldUrl?.split('/').at(-1)}`)
-    
-    // save new user avatar Url
-    user = await this.userRepo.save({...user, avatarUrl: `${this.config.get<string>('BACKEND_URL')}/images/${file?.filename}`})
-
-    //return updated successfully message
-    return {message:"updated profile avatar successfully",user}
   }
 
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
 
-  private deleteOldImage(path:string){
-   
-    return new Promise((resolve,reject)=>{
-      fs.unlink(path,(err)=>{
-        if(err){
-          console.log(err)
-          throw new InternalServerErrorException(`${err?.message}`)
+  private async deleteOldImage(path:string){
+    const filename = path.split('/').at(-1)?.split('.')[0]??'';
+    if(this.cloudinaryService.isCloudinaryEnabled()){
+      await this.cloudinaryService.deleteProfile(filename)
+      return 'deleted successfully'
+    }else{
+      try {
+        await unlink(`./upload/${filename}`);
+        console.log('deleted successfully');
+        return 'deleted successfully';
+      } catch (err) {
+        console.log(err);
+        // Do not throw an error if the file just doesn't exist anymore, just ignore it
+        if (err.code !== 'ENOENT') { 
+          throw new InternalServerErrorException(err.message);
         }
-        console.log('deleted successfully')
-        resolve('deleted successfully')
-    })
-    })
+      }
+    }
+  }
+
+  private async deleteLocalFile(filePath:string){
+    try {
+      if (fs.existsSync(filePath)) {
+        await unlink(filePath);
+      }
+    } catch (error) {
+      console.error('Error deleting local file:', error);
+    }
   }
 }

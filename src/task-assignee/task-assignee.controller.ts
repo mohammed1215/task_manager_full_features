@@ -17,18 +17,18 @@ export class TaskAssigneeController {
     return this.taskAssigneeService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.taskAssigneeService.findOne(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.taskAssigneeService.findOne(+id);
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateTaskAssigneeDto: UpdateTaskAssigneeDto) {
-    return this.taskAssigneeService.update(+id, updateTaskAssigneeDto);
-  }
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateTaskAssigneeDto: UpdateTaskAssigneeDto) {
+  //   return this.taskAssigneeService.update(+id, updateTaskAssigneeDto);
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.taskAssigneeService.remove(+id);
-  }
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.taskAssigneeService.remove(+id);
+  // }
 }

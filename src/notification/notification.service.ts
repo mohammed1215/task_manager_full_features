@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
+// import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notification, NotificationTypes } from './entities/notification.entity';
 import { LessThan, Repository } from 'typeorm';
@@ -74,11 +74,11 @@ export class NotificationService {
     console.log('Automatically marked 7-day old notifications as read. Number of affected rows '+result.affected);
   }
 
-  update(id: number, updateNotificationDto: UpdateNotificationDto) {
-    return `This action updates a #${id} notification`;
-  }
+  // update(id: number, updateNotificationDto: UpdateNotificationDto) {
+  //   return `This action updates a #${id} notification`;
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} notification`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} notification`;
+  // }
 }

@@ -12,9 +12,9 @@ export class TaskWatcherService {
     return `This action returns all taskWatcher`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} taskWatcher`;
-  }
+  // findOne(id: number) {
+  //   return `This action returns a #${id} taskWatcher`;
+  // }
 
   update(id: number, updateTaskWatcherDto: UpdateTaskWatcherDto) {
     return `This action updates a #${id} taskWatcher`;

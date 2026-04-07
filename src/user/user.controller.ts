@@ -8,7 +8,10 @@ import { type jwtPayload } from 'src/interface/jwt-payload.interface';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 
+@ApiTags('Users')
+@ApiBearerAuth()
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -35,6 +38,9 @@ export class UserController {
 
   @Get('me')
   @UseGuards(JwtGuard)
+  @ApiOperation({ summary: 'Get current user profile', description: 'Retrieve authenticated user profile information' })
+  @ApiResponse({ status: 200, description: 'User profile retrieved successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   findMe(@User() user:jwtPayload){
     console.log(user)
     return this.userService.findOne(user.userId)
@@ -42,6 +48,11 @@ export class UserController {
 
   @Patch('me')
   @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Update user profile', description: 'Update current user profile information' })
+  @ApiResponse({ status: 200, description: 'Profile updated successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiBody({ type: UpdateProfileDto })
   async updateProfile(@User() user:jwtPayload,@Body() updateProfileDto:UpdateProfileDto){
     return {message:await this.userService.updateProfile(user.userId,updateProfileDto)}
   }
@@ -49,6 +60,22 @@ export class UserController {
   @Post('me/avatar')
   @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(FileInterceptor('avatar'))
+  @ApiOperation({ summary: 'Upload user avatar', description: 'Upload a new avatar image for the current user (max 5MB)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        avatar: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Avatar uploaded successfully' })
+  @ApiResponse({ status: 400, description: 'File too large or invalid format' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async uploadAvatar(@User() user:jwtPayload, @UploadedFile(new ParseFilePipe({fileIsRequired:true,validators:[
     new MaxFileSizeValidator({maxSize:5*1024*1024}),
   ]})) file:Express.Multer.File){

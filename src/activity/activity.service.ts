@@ -30,15 +30,15 @@ export class ActivityService {
     return {activities,pageCount: Math.ceil(count/limit),repoCount: count};
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} activity`;
-  }
+  // findOne(id: number) {
+  //   return `This action returns a #${id} activity`;
+  // }
 
-  update(id: number, updateActivityDto: UpdateActivityDto) {
-    return `This action updates a #${id} activity`;
-  }
+  // update(id: number, updateActivityDto: UpdateActivityDto) {
+  //   return `This action updates a #${id} activity`;
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} activity`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} activity`;
+  // }
 }

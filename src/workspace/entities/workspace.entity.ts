@@ -1,6 +1,7 @@
 import { User } from "src/user/entities/user.entity";
 import { WorkspaceMember } from "src/workspace-member/entities/workspace-member.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Board } from "src/board/entities/board.entity"
 
 @Entity()
 export class Workspace {
@@ -33,4 +34,9 @@ export class Workspace {
 
     @OneToMany(()=>WorkspaceMember,(workspaceMember)=> workspaceMember.workspace)
     members: WorkspaceMember[]
+
+    @OneToMany(()=>Board,(board)=>board.workspace)
+    boards:Board[]
 }
+
+
