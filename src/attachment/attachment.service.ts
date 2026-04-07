@@ -12,7 +12,6 @@ import { Attachment } from './entities/attachment.entity';
 import { Repository } from 'typeorm';
 import { Task } from 'src/task/entities/task.entity';
 import { BoardMember } from 'src/board/entities/board-member.entity';
-import { Readable } from 'stream';
 import { createReadStream, existsSync } from 'fs';
 import { ConfigService } from '@nestjs/config';
 import { loadEnvFile } from 'process';
@@ -20,8 +19,8 @@ import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.
 import { WorkspaceMemberRoles } from 'src/workspace-member/enum/WorkspaceMember.enum';
 import fs from 'fs';
 import { unlink } from 'fs/promises';
-import cloudinary from 'cloudinary';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+
 loadEnvFile();
 
 @Injectable()
@@ -67,44 +66,48 @@ export class AttachmentService {
         'max number of attachments per task reached(10/10)',
       );
     }
-    
+
     //upload file on cloudinary if production
     let resultOfUploading;
     try {
-      
-      if(this.cloudinaryService.isCloudinaryEnabled()){
-        const resourceType = this.getResourceType(attachment.mimetype)
-        
-        resultOfUploading = await this.cloudinaryService.uploadFile(attachment,resourceType)
+      if (this.cloudinaryService.isCloudinaryEnabled()) {
+        const resourceType = this.getResourceType(attachment.mimetype);
+
+        resultOfUploading = await this.cloudinaryService.uploadFile(
+          attachment,
+          resourceType,
+        );
         // Delete local file after upload (important for Vercel)
         await this.deleteLocalFile(attachment.path);
-      }else{
+      } else {
         resultOfUploading = null;
       }
-      
+
       //create attachment
       const attachmentRow = this.attachmentRepo.create({
         filename: attachment.filename,
-      fileSize: attachment.size,
-      originalFilename: attachment.originalname,
-      uploadedBy: { id: userId },
-      task: { id: taskId },
-      storagePath: this.cloudinaryService.isCloudinaryEnabled()?resultOfUploading.url:`/${attachment.path}`,
-      contentType: attachment.mimetype,
-    });
-    return this.attachmentRepo.save(attachmentRow);
-  } catch (error) {
-    if(existsSync(attachment.path)){
-      await this.deleteLocalFile(attachment.path)
-    } 
-    throw error
-  }
+        fileSize: attachment.size,
+        originalFilename: attachment.originalname,
+        uploadedBy: { id: userId },
+        task: { id: taskId },
+        storagePath: this.cloudinaryService.isCloudinaryEnabled()
+          ? resultOfUploading.url
+          : `/${attachment.path}`,
+        contentType: attachment.mimetype,
+      });
+      return this.attachmentRepo.save(attachmentRow);
+    } catch (error) {
+      if (existsSync(attachment.path)) {
+        await this.deleteLocalFile(attachment.path);
+      }
+      throw error;
+    }
   }
 
   async findAll(taskId: string) {
     //TODO: EDIT URL OF DOWNLOADING
     return {
-        attachments: this.attachmentRepo.find({
+      attachments: this.attachmentRepo.find({
         where: {
           task: { id: taskId },
         },
@@ -112,7 +115,7 @@ export class AttachmentService {
         order: {
           uploadedBy: 'DESC',
         },
-      })
+      }),
     };
   }
 
@@ -129,11 +132,14 @@ export class AttachmentService {
     const file = createReadStream(
       `./upload/attachments/${attachment.filename}`,
     );
-    if(this.cloudinaryService.isCloudinaryEnabled()){
+    if (this.cloudinaryService.isCloudinaryEnabled()) {
       return {
-        url: attachment.storagePath.replace('/upload/','/upload/fl_attachment/'),
-        redirect: true
-      }
+        url: attachment.storagePath.replace(
+          '/upload/',
+          '/upload/fl_attachment/',
+        ),
+        redirect: true,
+      };
     }
     return new StreamableFile(file, {
       length: attachment.fileSize,
@@ -191,10 +197,10 @@ export class AttachmentService {
     return 'raw'; // PDFs, DOCX, XLSX, etc.
   }
 
-   private async deleteLocalFile(filePath: string): Promise<void> {
+  private async deleteLocalFile(filePath: string): Promise<void> {
     try {
       if (existsSync(filePath)) {
-        await unlink(filePath)
+        await unlink(filePath);
       }
     } catch (error) {
       console.error('Error deleting local file:', error);
