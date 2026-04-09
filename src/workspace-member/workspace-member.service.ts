@@ -8,9 +8,9 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class WorkspaceMemberService {
   constructor(
-    @InjectRepository(WorkspaceMember) private readonly workspaceMemberRepo:Repository<WorkspaceMember>,
-
-  ){}
+    @InjectRepository(WorkspaceMember)
+    private readonly workspaceMemberRepo: Repository<WorkspaceMember>,
+  ) {}
   create(createWorkspaceMemberDto: CreateWorkspaceMemberDto) {
     return 'This action adds a new workspaceMember';
   }
@@ -19,9 +19,11 @@ export class WorkspaceMemberService {
     return `This action returns all workspaceMember`;
   }
 
-  async findOne(workspaceId: string,memberId:string) {
-    const member = await this.workspaceMemberRepo.findOne({where:{workspace: {id:workspaceId},user:{id:memberId}}})
-    if(!member) throw new NotFoundException('Member Not Found')
+  async findOne(workspaceId: string, memberId: string) {
+    const member = await this.workspaceMemberRepo.findOne({
+      where: { workspace: { id: workspaceId }, user: { id: memberId } },
+    });
+    if (!member) throw new NotFoundException('Member Not Found');
     return member;
   }
 

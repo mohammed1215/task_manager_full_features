@@ -1,4 +1,4 @@
-import { Task } from './task/entities/task.entity';
+import { Task } from '../../task/entities/task.entity.ts';
 import { User } from '../../user/entities/user.entity.ts';
 import {
   Column,

@@ -1,6 +1,6 @@
-import { Workspace } from "../../workspace/entities/workspace.entity.ts";
+import { Workspace } from "../../workspace/entities/workspace.entity";
 import { Column, CreateDateColumn, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, Unique } from "typeorm"
-import { Task } from "../../task/entities/task.entity.ts";
+import { Task } from "../../task/entities/task.entity";
 
 @Entity()
 export class Tag {

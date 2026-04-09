@@ -1,3 +1,6 @@
+fix_imports.py
+fix_src_imports.py
+debug_regex.py
 .git
 .gitignore
 README.md
