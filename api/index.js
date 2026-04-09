@@ -1,2 +1,2 @@
-"use strict";
-module.exports = require("../dist/vercel").default;
+'use strict';
+module.exports = require('../dist/vercel').default;
