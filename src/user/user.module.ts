@@ -8,38 +8,44 @@ import { MulterModule } from '@nestjs/platform-express';
 import multer from 'multer';
 import { existsSync, mkdirSync } from 'fs';
 import { Activity } from 'src/activity/entities/activity.entity';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],
-  imports: [TypeOrmModule.forFeature([User,Activity]),forwardRef(()=>AuthModule),  MulterModule.register({
-    storage: multer.diskStorage({
-      destination(req, file, callback) {
-        console.log('📂 Target Destination: ./upload');
-        const uploadPath = './upload'
-        if (!existsSync(uploadPath)) {
-          mkdirSync(uploadPath, { recursive: true });
-        } 
-        callback(null,'./upload')
-      },
-      filename(req, file, callback) {
-        const time = Date.now()
-        const randomString = Math.floor(Math.random() * 1000000)
-        const filename = `${randomString}_${time}_${file.originalname}`
-        console.log('📄 Generated Filename:', filename); // Check if name is valid
-        callback(null,filename)
+  imports: [
+    TypeOrmModule.forFeature([User, Activity]),
+    forwardRef(() => AuthModule),
+    MulterModule.register({
+      storage: multer.diskStorage({
+        destination(req, file, callback) {
+          console.log('📂 Target Destination: ./upload');
+          const uploadPath = './upload';
+          if (!existsSync(uploadPath)) {
+            mkdirSync(uploadPath, { recursive: true });
+          }
+          callback(null, './upload');
+        },
+        filename(req, file, callback) {
+          const time = Date.now();
+          const randomString = Math.floor(Math.random() * 1000000);
+          const filename = `${randomString}_${time}_${file.originalname}`;
+          console.log('📄 Generated Filename:', filename); // Check if name is valid
+          callback(null, filename);
+        },
+      }),
+      fileFilter(req, file, callback) {
+        if (file.mimetype.split('/')[0] !== 'image') {
+          console.error('❌ Rejected: Not an image');
+          callback(new BadRequestException('not allowed file type'), false);
+          return;
+        }
+        console.log('✅ Accepted: File is an image');
+        callback(null, true);
       },
     }),
-    fileFilter(req, file, callback) {
-      if(file.mimetype.split('/')[0] !== 'image'){
-        console.error('❌ Rejected: Not an image');
-        callback(new BadRequestException('not allowed file type'),false)
-        return
-      }
-      console.log('✅ Accepted: File is an image');
-      callback(null,true)
-    },
-  })]
+    CloudinaryModule,
+  ],
 })
 export class UserModule {}
