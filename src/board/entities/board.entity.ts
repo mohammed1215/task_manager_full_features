@@ -1,9 +1,9 @@
-import { ColumnEntity } from "src/column/entities/column.entity";
-import { User } from "src/user/entities/user.entity";
-import { Workspace } from "src/workspace/entities/workspace.entity";
+import { ColumnEntity } from "../../column/entities/column.entity.ts";
+import { User } from "../../user/entities/user.entity.ts";
+import { Workspace } from "../../workspace/entities/workspace.entity.ts";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { BoardMember } from "./board-member.entity";
-import { Task } from "src/task/entities/task.entity";
+import { BoardMember } from "./board-member.entity.ts";
+import { Task } from "../../task/entities/task.entity.ts";
 
 export enum Visibility{
     PUBLIC='PUBLIC',

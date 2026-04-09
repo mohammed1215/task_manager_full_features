@@ -1,5 +1,5 @@
-import { Board } from "src/board/entities/board.entity";
-import { Task } from "src/task/entities/task.entity";
+import { Board } from "../../board/entities/board.entity.ts";
+import { Task } from "../../task/entities/task.entity.ts";
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()

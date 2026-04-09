@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTaskTagDto } from './dto/create-task-tag.dto';
-import { UpdateTaskTagDto } from './dto/update-task-tag.dto';
+import { CreateTaskTagDto } from './dto/create-task-tag.dto.ts';
+import { UpdateTaskTagDto } from './dto/update-task-tag.dto.ts';
 
 @Injectable()
 export class TaskTagsService {

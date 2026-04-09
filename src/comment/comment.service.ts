@@ -1,16 +1,16 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
+import { CreateCommentDto } from './dto/create-comment.dto.ts';
+import { UpdateCommentDto } from './dto/update-comment.dto.ts';
 import { Or, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Comment } from './entities/comment.entity';
-import { Task } from 'src/task/entities/task.entity';
-import { BoardService } from 'src/board/board.service';
-import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.entity';
-import { Board } from 'src/board/entities/board.entity';
-import { BoardMember } from 'src/board/entities/board-member.entity';
-import { WorkspaceMemberRoles } from 'src/workspace-member/enum/WorkspaceMember.enum';
-import { TaskWatcher } from 'src/task-watcher/entities/task-watcher.entity';
+import { Comment } from './entities/comment.entity.ts';
+import { Task } from '../task/entities/task.entity.ts';
+import { BoardService } from '../board/board.service.ts';
+import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity.ts';
+import { Board } from '../board/entities/board.entity.ts';
+import { BoardMember } from '../board/entities/board-member.entity.ts';
+import { WorkspaceMemberRoles } from '../workspace-member/enum/WorkspaceMember.enum.ts';
+import { TaskWatcher } from '../task-watcher/entities/task-watcher.entity.ts';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()

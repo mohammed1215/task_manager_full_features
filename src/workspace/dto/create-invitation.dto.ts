@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum, IsIn, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { WorkspaceMemberRoles } from "src/workspace-member/enum/WorkspaceMember.enum";
+import { WorkspaceMemberRoles } from "../../workspace-member/enum/WorkspaceMember.enum.ts";
 import { ApiProperty } from "@nestjs/swagger";
 
 const AllowedRoles = Object.values(WorkspaceMemberRoles).filter((role)=> role!== WorkspaceMemberRoles.owner)

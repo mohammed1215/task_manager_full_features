@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BoardController } from './board.controller';
-import { BoardService } from './board.service';
+import { BoardController } from './board.controller.ts';
+import { BoardService } from './board.service.ts';
 
 describe('BoardController', () => {
   let controller: BoardController;

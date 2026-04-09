@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Workspace } from "./workspace.entity";
-import { User } from "src/user/entities/user.entity";
-import { WorkspaceMemberRoles } from "src/workspace-member/enum/WorkspaceMember.enum";
+import { Workspace } from "./workspace.entity.ts";
+import { User } from "../../user/entities/user.entity.ts";
+import { WorkspaceMemberRoles } from "../../workspace-member/enum/WorkspaceMember.enum.ts";
 
 @Entity()
 export class Invitation{

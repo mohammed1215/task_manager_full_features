@@ -1,11 +1,11 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { BoardService } from './board.service';
-import { BoardController } from './board.controller';
+import { BoardService } from './board.service.ts';
+import { BoardController } from './board.controller.ts';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Board } from './entities/board.entity';
-import { WorkspaceMemberModule } from '../workspace-member/workspace-member.module';
-import { ColumnModule } from '../column/column.module';
-import { BoardMember } from './entities/board-member.entity';
+import { Board } from './entities/board.entity.ts';
+import { WorkspaceMemberModule } from '../workspace-member/workspace-member.module.ts';
+import { ColumnModule } from '../column/column.module.ts';
+import { BoardMember } from './entities/board-member.entity.ts';
 
 @Module({
   controllers: [BoardController],

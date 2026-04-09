@@ -1,4 +1,4 @@
-import { User } from "src/user/entities/user.entity";
+import { User } from "../../user/entities/user.entity.ts";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum NotificationTypes {

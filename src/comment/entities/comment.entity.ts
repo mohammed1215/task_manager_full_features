@@ -1,5 +1,5 @@
-import { Task } from "src/task/entities/task.entity";
-import { User } from "src/user/entities/user.entity";
+import { Task } from "../../task/entities/task.entity.ts";
+import { User } from "../../user/entities/user.entity.ts";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm"
 
 @Entity()

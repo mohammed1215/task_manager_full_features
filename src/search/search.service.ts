@@ -1,10 +1,10 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { SearchQueryDto, SearchTypes } from './dto/query-search.dto';
+import { SearchQueryDto, SearchTypes } from './dto/query-search.dto.ts';
 import { ILike, In, Repository } from 'typeorm';
-import { Task } from 'src/task/entities/task.entity';
+import { Task } from '../task/entities/task.entity.ts';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Board } from 'src/board/entities/board.entity';
-import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.entity';
+import { Board } from '../board/entities/board.entity.ts';
+import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity.ts';
 @Injectable()
 export class SearchService {
   constructor(

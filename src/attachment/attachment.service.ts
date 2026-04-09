@@ -5,21 +5,21 @@ import {
   NotFoundException,
   StreamableFile,
 } from '@nestjs/common';
-import { CreateAttachmentDto } from './dto/create-attachment.dto';
-import { UpdateAttachmentDto } from './dto/update-attachment.dto';
+import { CreateAttachmentDto } from './dto/create-attachment.dto.ts';
+import { UpdateAttachmentDto } from './dto/update-attachment.dto.ts';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Attachment } from './entities/attachment.entity';
+import { Attachment } from './entities/attachment.entity.ts';
 import { Repository } from 'typeorm';
-import { Task } from 'src/task/entities/task.entity';
-import { BoardMember } from 'src/board/entities/board-member.entity';
+import { Task } from '../task/entities/task.entity.ts';
+import { BoardMember } from '../board/entities/board-member.entity.ts';
 import { createReadStream, existsSync } from 'fs';
 import { ConfigService } from '@nestjs/config';
 import { loadEnvFile } from 'process';
-import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.entity';
-import { WorkspaceMemberRoles } from 'src/workspace-member/enum/WorkspaceMember.enum';
+import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity.ts';
+import { WorkspaceMemberRoles } from '../workspace-member/enum/WorkspaceMember.enum.ts';
 import fs from 'fs';
 import { unlink } from 'fs/promises';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { CloudinaryService } from '../cloudinary/cloudinary.service.ts';
 
 loadEnvFile();
 

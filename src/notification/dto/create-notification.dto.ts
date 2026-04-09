@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsString } from "class-validator";
-import { NotificationTypes } from "../entities/notification.entity";
+import { NotificationTypes } from "../entities/notification.entity.ts";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateNotificationDto {

@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CreateActivityDto } from './dto/create-activity.dto';
-import { UpdateActivityDto } from './dto/update-activity.dto';
+import { CreateActivityDto } from './dto/create-activity.dto.ts';
+import { UpdateActivityDto } from './dto/update-activity.dto.ts';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Activity } from './entities/activity.entity';
+import { Activity } from './entities/activity.entity.ts';
 import { Repository } from 'typeorm';
 
 @Injectable()

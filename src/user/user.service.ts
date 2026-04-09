@@ -1,15 +1,15 @@
 import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/create-user.dto.ts';
+import { UpdateUserDto } from './dto/update-user.dto.ts';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { User } from './entities/user.entity.ts';
 import { Repository } from 'typeorm';
 import bcrypt from 'bcrypt'
-import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto.ts';
 import { ConfigService } from '@nestjs/config';
 import fs from 'fs'
-import { Activity } from 'src/activity/entities/activity.entity';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { Activity } from '../activity/entities/activity.entity.ts';
+import { CloudinaryService } from '../cloudinary/cloudinary.service.ts';
 import { unlink } from 'fs/promises';
 
 @Injectable()

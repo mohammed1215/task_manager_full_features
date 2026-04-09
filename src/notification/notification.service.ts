@@ -1,12 +1,12 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { CreateNotificationDto } from './dto/create-notification.dto';
-// import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { CreateNotificationDto } from './dto/create-notification.dto.ts';
+// import { UpdateNotificationDto } from './dto/update-notification.dto.ts';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Notification, NotificationTypes } from './entities/notification.entity';
+import { Notification, NotificationTypes } from './entities/notification.entity.ts';
 import { LessThan, Repository } from 'typeorm';
-import { NotificationGateway } from './notification.gateway';
+import { NotificationGateway } from './notification.gateway.ts';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { TaskService } from 'src/task/task.service';
+import { TaskService } from '../task/task.service.ts';
 
 @Injectable()
 export class NotificationService {

@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { TaskTagsService } from './task-tags.service';
-import { CreateTaskTagDto } from './dto/create-task-tag.dto';
-import { UpdateTaskTagDto } from './dto/update-task-tag.dto';
+import { TaskTagsService } from './task-tags.service.ts';
+import { CreateTaskTagDto } from './dto/create-task-tag.dto.ts';
+import { UpdateTaskTagDto } from './dto/update-task-tag.dto.ts';
 
 @Controller('task-tags')
 export class TaskTagsController {

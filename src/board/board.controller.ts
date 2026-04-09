@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, DefaultValuePipe, ParseIntPipe, ParseEnumPipe } from '@nestjs/common';
-import { BoardService } from './board.service';
-import { CreateBoardDto } from './dto/create-board.dto';
-import { UpdateBoardDto } from './dto/update-board.dto';
-import { User } from 'src/user/decorator/user.decorator';
-import { type jwtPayload } from 'src/interface/jwt-payload.interface';
-import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { BoardService } from './board.service.ts';
+import { CreateBoardDto } from './dto/create-board.dto.ts';
+import { UpdateBoardDto } from './dto/update-board.dto.ts';
+import { User } from '../user/decorator/user.decorator.ts';
+import { type jwtPayload } from '../interface/jwt-payload.interface.ts';
+import { JwtGuard } from '../auth/guard/jwt.guard.ts';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
 
 export enum BoardFilter {

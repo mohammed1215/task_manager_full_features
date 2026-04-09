@@ -1,17 +1,17 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { TaskService } from './task.service';
-import { TaskController } from './task.controller';
+import { TaskService } from './task.service.ts';
+import { TaskController } from './task.controller.ts';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Task } from './entities/task.entity';
-import { TaskAssignee } from 'src/task-assignee/entities/task-assignee.entity';
-import { ColumnEntity } from 'src/column/entities/column.entity';
-import { Tag } from 'src/tag/entities/tag.entity';
-import { BoardModule } from 'src/board/board.module';
-import { TaskWatcher } from 'src/task-watcher/entities/task-watcher.entity';
-import { BoardMember } from 'src/board/entities/board-member.entity';
-import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.entity';
-import { AppModule } from 'src/app.module';
-import { User } from 'src/user/entities/user.entity';
+import { Task } from './entities/task.entity.ts';
+import { TaskAssignee } from '../task-assignee/entities/task-assignee.entity.ts';
+import { ColumnEntity } from '../column/entities/column.entity.ts';
+import { Tag } from '../tag/entities/tag.entity.ts';
+import { BoardModule } from '../board/board.module.ts';
+import { TaskWatcher } from '../task-watcher/entities/task-watcher.entity.ts';
+import { BoardMember } from '../board/entities/board-member.entity.ts';
+import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity.ts';
+import { AppModule } from '../app.module.ts';
+import { User } from '../user/entities/user.entity.ts';
 
 @Module({
   controllers: [TaskController],

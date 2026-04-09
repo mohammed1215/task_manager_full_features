@@ -1,5 +1,5 @@
 import { IsArray, IsDateString, IsEnum, IsPositive, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, Length } from "class-validator";
-import { PriorityTask } from "../entities/task.entity";
+import { PriorityTask } from "../entities/task.entity.ts";
 import { ApiProperty } from "@nestjs/swagger";
 import {Type} from 'class-transformer'
 export class CreateTaskDto {

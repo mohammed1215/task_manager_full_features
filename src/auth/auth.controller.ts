@@ -1,7 +1,7 @@
 import { BadRequestException, Body, Controller, Post, Query } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { LoginDto } from './dto/login.dto';
+import { AuthService } from './auth.service.ts';
+import { CreateUserDto } from '../user/dto/create-user.dto.ts';
+import { LoginDto } from './dto/login.dto.ts';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery } from '@nestjs/swagger';
 
 @ApiTags('Authentication')

@@ -1,17 +1,17 @@
 import { InternalServerErrorException, Module } from '@nestjs/common';
-import { AttachmentService } from './attachment.service';
-import { AttachmentController } from './attachment.controller';
+import { AttachmentService } from './attachment.service.ts';
+import { AttachmentController } from './attachment.controller.ts';
 import { MulterModule } from '@nestjs/platform-express';
 import {diskStorage} from 'multer';
 import fs from 'fs'
 import { randomUUID } from 'crypto';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Attachment } from './entities/attachment.entity';
-import { Task } from 'src/task/entities/task.entity';
-import { BoardMember } from 'src/board/entities/board-member.entity';
-import { Activity } from 'src/activity/entities/activity.entity';
-import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.entity';
-import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
+import { Attachment } from './entities/attachment.entity.ts';
+import { Task } from '../task/entities/task.entity.ts';
+import { BoardMember } from '../board/entities/board-member.entity.ts';
+import { Activity } from '../activity/entities/activity.entity.ts';
+import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity.ts';
+import { CloudinaryModule } from '../cloudinary/cloudinary.module.ts';
 @Module({
   controllers: [AttachmentController],
   providers: [AttachmentService],

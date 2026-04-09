@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, DefaultValuePipe, ParseIntPipe } from '@nestjs/common';
-import { ActivityService } from './activity.service';
-import { CreateActivityDto } from './dto/create-activity.dto';
-import { UpdateActivityDto } from './dto/update-activity.dto';
-import { User } from 'src/user/decorator/user.decorator';
-import { JwtGuard } from 'src/auth/guard/jwt.guard';
-import { type jwtPayload } from 'src/interface/jwt-payload.interface';
-import { ParsePositivePipe } from 'src/Pipes/parse-positive.pipe';
+import { ActivityService } from './activity.service.ts';
+import { CreateActivityDto } from './dto/create-activity.dto.ts';
+import { UpdateActivityDto } from './dto/update-activity.dto.ts';
+import { User } from '../user/decorator/user.decorator.ts';
+import { JwtGuard } from '../auth/guard/jwt.guard.ts';
+import { type jwtPayload } from '../interface/jwt-payload.interface.ts';
+import { ParsePositivePipe } from '../Pipes/parse-positive.pipe.ts';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiBody, ApiQuery, ApiParam } from '@nestjs/swagger';
 
 @ApiTags('Activity')

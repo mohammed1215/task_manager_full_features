@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AttachmentController } from './attachment.controller';
-import { AttachmentService } from './attachment.service';
+import { AttachmentController } from './attachment.controller.ts';
+import { AttachmentService } from './attachment.service.ts';
 
 describe('AttachmentController', () => {
   let controller: AttachmentController;

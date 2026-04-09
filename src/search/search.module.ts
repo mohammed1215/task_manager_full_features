@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { SearchService } from './search.service';
-import { SearchController } from './search.controller';
+import { SearchService } from './search.service.ts';
+import { SearchController } from './search.controller.ts';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Board } from 'src/board/entities/board.entity';
-import { Task } from 'src/task/entities/task.entity';
-import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.entity';
+import { Board } from '../board/entities/board.entity.ts';
+import { Task } from '../task/entities/task.entity.ts';
+import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity.ts';
 
 @Module({
   controllers: [SearchController],

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TaskWatcherController } from './task-watcher.controller';
-import { TaskWatcherService } from './task-watcher.service';
+import { TaskWatcherController } from './task-watcher.controller.ts';
+import { TaskWatcherService } from './task-watcher.service.ts';
 
 describe('TaskWatcherController', () => {
   let controller: TaskWatcherController;

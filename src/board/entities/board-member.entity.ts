@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { Board } from "./board.entity";
-import { User } from "src/user/entities/user.entity";
+import { Board } from "./board.entity.ts";
+import { User } from "../../user/entities/user.entity.ts";
 
 export enum BoardRoles{
     ADMIN='ADMIN',

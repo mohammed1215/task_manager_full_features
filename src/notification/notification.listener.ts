@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
-import { NotificationService } from "./notification.service";
-import { MailService } from "src/mail/mail.service";
+import { NotificationService } from "./notification.service.ts";
+import { MailService } from "../mail/mail.service.ts";
 import { OnEvent } from "@nestjs/event-emitter";
-import { NotificationTypes } from "./entities/notification.entity";
-import { UserService } from "src/user/user.service";
-import { EmailPreference } from "src/user/entities/user.entity";
+import { NotificationTypes } from "./entities/notification.entity.ts";
+import { UserService } from "../user/user.service.ts";
+import { EmailPreference } from "../user/entities/user.entity.ts";
 import { Cron, CronExpression } from "@nestjs/schedule";
-import { TaskService } from "src/task/task.service";
+import { TaskService } from "../task/task.service.ts";
 
 @Injectable()
 export class NotificationListener{

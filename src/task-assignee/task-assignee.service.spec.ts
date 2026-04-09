@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TaskAssigneeService } from './task-assignee.service';
+import { TaskAssigneeService } from './task-assignee.service.ts';
 
 describe('TaskAssigneeService', () => {
   let service: TaskAssigneeService;

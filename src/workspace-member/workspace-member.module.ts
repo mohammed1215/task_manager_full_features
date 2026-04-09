@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { WorkspaceMemberService } from './workspace-member.service';
-import { WorkspaceMemberController } from './workspace-member.controller';
+import { WorkspaceMemberService } from './workspace-member.service.ts';
+import { WorkspaceMemberController } from './workspace-member.controller.ts';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { WorkspaceMember } from './entities/workspace-member.entity';
+import { WorkspaceMember } from './entities/workspace-member.entity.ts';
 
 @Module({
   controllers: [WorkspaceMemberController],

@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { NotificationService } from './notification.service';
-import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
-import { JwtGuard } from 'src/auth/guard/jwt.guard';
-import { User } from 'src/user/decorator/user.decorator';
-import { type jwtPayload } from 'src/interface/jwt-payload.interface';
+import { NotificationService } from './notification.service.ts';
+import { CreateNotificationDto } from './dto/create-notification.dto.ts';
+import { UpdateNotificationDto } from './dto/update-notification.dto.ts';
+import { JwtGuard } from '../auth/guard/jwt.guard.ts';
+import { User } from '../user/decorator/user.decorator.ts';
+import { type jwtPayload } from '../interface/jwt-payload.interface.ts';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 
 @ApiTags('Notifications')

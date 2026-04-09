@@ -14,12 +14,12 @@ import {
   FileTypeValidator,
 } from '@nestjs/common';
 import cloudinary from 'cloudinary';
-import { AttachmentService } from './attachment.service';
-import { CreateAttachmentDto } from './dto/create-attachment.dto';
-import { UpdateAttachmentDto } from './dto/update-attachment.dto';
-import { JwtGuard } from 'src/auth/guard/jwt.guard';
-import { User } from 'src/user/decorator/user.decorator';
-import { type jwtPayload } from 'src/interface/jwt-payload.interface';
+import { AttachmentService } from './attachment.service.ts';
+import { CreateAttachmentDto } from './dto/create-attachment.dto.ts';
+import { UpdateAttachmentDto } from './dto/update-attachment.dto.ts';
+import { JwtGuard } from '../auth/guard/jwt.guard.ts';
+import { User } from '../user/decorator/user.decorator.ts';
+import { type jwtPayload } from '../interface/jwt-payload.interface.ts';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,

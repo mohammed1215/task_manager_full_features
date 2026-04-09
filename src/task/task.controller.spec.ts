@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TaskController } from './task.controller';
-import { TaskService } from './task.service';
+import { TaskController } from './task.controller.ts';
+import { TaskService } from './task.service.ts';
 
 describe('TaskController', () => {
   let controller: TaskController;

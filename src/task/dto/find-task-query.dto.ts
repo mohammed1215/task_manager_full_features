@@ -1,7 +1,7 @@
 import { Type } from "class-transformer";
 import { IsDate, IsDateString, IsEnum, IsInt, IsOptional, IsPositive, IsUUID } from "class-validator";
-import { PriorityTask } from "../entities/task.entity";
-import { SortBy, SortOrder } from "src/enum/enum";
+import { PriorityTask } from "../entities/task.entity.ts";
+import { SortBy, SortOrder } from "../../enum/enum.ts";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class FindTasksQueryDto{

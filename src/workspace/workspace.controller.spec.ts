@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { WorkspaceController } from './workspace.controller';
-import { WorkspaceService } from './workspace.service';
+import { WorkspaceController } from './workspace.controller.ts';
+import { WorkspaceService } from './workspace.service.ts';
 
 describe('WorkspaceController', () => {
   let controller: WorkspaceController;

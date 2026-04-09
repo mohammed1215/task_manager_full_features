@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { UserService } from 'src/user/user.service';
-import { LoginDto } from './dto/login.dto';
+import { CreateUserDto } from '../user/dto/create-user.dto.ts';
+import { UserService } from '../user/user.service.ts';
+import { LoginDto } from './dto/login.dto.ts';
 import bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt';
-import { MailService } from 'src/mail/mail.service';
+import { MailService } from '../mail/mail.service.ts';
 import { ConfigService } from '@nestjs/config';
-import { JwtProviderService } from 'src/jwt-provider/jwt-provider.service';
+import { JwtProviderService } from '../jwt-provider/jwt-provider.service.ts';
 @Injectable()
 export class AuthService {
 

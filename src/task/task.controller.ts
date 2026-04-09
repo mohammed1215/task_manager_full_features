@@ -1,13 +1,13 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, DefaultValuePipe, ParseIntPipe, ParseUUIDPipe, ParseEnumPipe, ParseDatePipe } from '@nestjs/common';
-import { TaskService } from './task.service';
-import { CreateTaskDto } from './dto/create-task.dto';
-import { UpdateTaskDto } from './dto/update-task.dto';
-import { JwtGuard } from 'src/auth/guard/jwt.guard';
-import { User } from 'src/user/decorator/user.decorator';
-import { type jwtPayload } from 'src/interface/jwt-payload.interface';
-import { FindTasksQueryDto } from './dto/find-task-query.dto';
-import { AssignUsersToTaskDto } from './dto/assign-users.dto';
-import { MoveTaskDto } from './entities/move-task.dto';
+import { TaskService } from './task.service.ts';
+import { CreateTaskDto } from './dto/create-task.dto.ts';
+import { UpdateTaskDto } from './dto/update-task.dto.ts';
+import { JwtGuard } from '../auth/guard/jwt.guard.ts';
+import { User } from '../user/decorator/user.decorator.ts';
+import { type jwtPayload } from '../interface/jwt-payload.interface.ts';
+import { FindTasksQueryDto } from './dto/find-task-query.dto.ts';
+import { AssignUsersToTaskDto } from './dto/assign-users.dto.ts';
+import { MoveTaskDto } from './entities/move-task.dto.ts';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('Tasks')

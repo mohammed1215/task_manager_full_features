@@ -1,14 +1,14 @@
 import { Exclude } from 'class-transformer';
-import { Activity } from 'src/activity/entities/activity.entity';
-import { Attachment } from 'src/attachment/entities/attachment.entity';
-import { BoardMember } from 'src/board/entities/board-member.entity';
-import { Comment } from 'src/comment/entities/comment.entity';
-import { TaskAssignee } from 'src/task-assignee/entities/task-assignee.entity';
-import { TaskWatcher } from 'src/task-watcher/entities/task-watcher.entity';
-import { Task } from 'src/task/entities/task.entity';
-import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.entity';
-import { Invitation } from 'src/workspace/entities/invitation.entity';
-import { Workspace } from 'src/workspace/entities/workspace.entity';
+import { Activity } from '../../activity/entities/activity.entity.ts';
+import { Attachment } from '../../attachment/entities/attachment.entity.ts';
+import { BoardMember } from '../../board/entities/board-member.entity.ts';
+import { Comment } from '../../comment/entities/comment.entity.ts';
+import { TaskAssignee } from '../../task-assignee/entities/task-assignee.entity.ts';
+import { TaskWatcher } from '../../task-watcher/entities/task-watcher.entity.ts';
+import { Task } from '../../task/entities/task.entity.ts';
+import { WorkspaceMember } from '../../workspace-member/entities/workspace-member.entity.ts';
+import { Invitation } from '../../workspace/entities/invitation.entity.ts';
+import { Workspace } from '../../workspace/entities/workspace.entity.ts';
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm'
 
 export enum EmailPreference {

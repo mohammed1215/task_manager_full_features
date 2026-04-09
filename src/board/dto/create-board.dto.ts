@@ -1,5 +1,5 @@
 import { IsBoolean, IsEnum, IsHexColor, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { Visibility } from "../entities/board.entity";
+import { Visibility } from "../entities/board.entity.ts";
 import { ApiProperty } from "@nestjs/swagger";
 
 export class CreateBoardDto {

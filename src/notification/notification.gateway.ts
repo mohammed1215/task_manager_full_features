@@ -1,8 +1,8 @@
 import { JwtService } from '@nestjs/jwt';
 import { OnGatewayConnection, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import {Server, Socket} from 'socket.io'
-import { jwtPayload } from 'src/interface/jwt-payload.interface';
-import { NotificationService } from './notification.service';
+import { jwtPayload } from '../interface/jwt-payload.interface.ts';
+import { NotificationService } from './notification.service.ts';
 import { forwardRef, Inject } from '@nestjs/common';
 @WebSocketGateway(3002,{
   cors:'*',

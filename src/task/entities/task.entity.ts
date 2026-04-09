@@ -1,13 +1,13 @@
-import { Activity } from "src/activity/entities/activity.entity";
-import { Attachment } from "src/attachment/entities/attachment.entity";
-// import { Attachment } from "src/attachment/entities/attachment.entity";
-import { Board } from "src/board/entities/board.entity";
-import { ColumnEntity } from "src/column/entities/column.entity";
-import { Comment } from "src/comment/entities/comment.entity";
-import { Tag } from "src/tag/entities/tag.entity";
-import { TaskAssignee } from "src/task-assignee/entities/task-assignee.entity";
-import { TaskWatcher } from "src/task-watcher/entities/task-watcher.entity";
-import { User } from "src/user/entities/user.entity";
+import { Activity } from "../../activity/entities/activity.entity.ts";
+import { Attachment } from "../../attachment/entities/attachment.entity.ts";
+// import { Attachment } from "../../attachment/entities/attachment.entity.ts";
+import { Board } from "../../board/entities/board.entity.ts";
+import { ColumnEntity } from "../../column/entities/column.entity.ts";
+import { Comment } from "../../comment/entities/comment.entity.ts";
+import { Tag } from "../../tag/entities/tag.entity.ts";
+import { TaskAssignee } from "../../task-assignee/entities/task-assignee.entity.ts";
+import { TaskWatcher } from "../../task-watcher/entities/task-watcher.entity.ts";
+import { User } from "../../user/entities/user.entity.ts";
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 export enum PriorityTask{

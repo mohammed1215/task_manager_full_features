@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { WorkspaceMemberService } from './workspace-member.service';
-import { CreateWorkspaceMemberDto } from './dto/create-workspace-member.dto';
-import { UpdateWorkspaceMemberDto } from './dto/update-workspace-member.dto';
+import { WorkspaceMemberService } from './workspace-member.service.ts';
+import { CreateWorkspaceMemberDto } from './dto/create-workspace-member.dto.ts';
+import { UpdateWorkspaceMemberDto } from './dto/update-workspace-member.dto.ts';
 
 @Controller('workspace-member')
 export class WorkspaceMemberController {

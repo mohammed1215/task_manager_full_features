@@ -1,14 +1,14 @@
 import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateBoardDto } from './dto/create-board.dto';
-import { UpdateBoardDto } from './dto/update-board.dto';
+import { CreateBoardDto } from './dto/create-board.dto.ts';
+import { UpdateBoardDto } from './dto/update-board.dto.ts';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Board, Visibility } from './entities/board.entity';
+import { Board, Visibility } from './entities/board.entity.ts';
 import { Repository } from 'typeorm';
-import { WorkspaceMemberService } from 'src/workspace-member/workspace-member.service';
-import { ColumnService } from 'src/column/column.service';
+import { WorkspaceMemberService } from '../workspace-member/workspace-member.service.ts';
+import { ColumnService } from '../column/column.service.ts';
 import {  DataSource } from 'typeorm';
-import { ColumnEntity } from 'src/column/entities/column.entity';
-import { BoardMember, BoardRoles } from './entities/board-member.entity';
+import { ColumnEntity } from '../column/entities/column.entity.ts';
+import { BoardMember, BoardRoles } from './entities/board-member.entity.ts';
 @Injectable()
 export class BoardService {
   constructor(

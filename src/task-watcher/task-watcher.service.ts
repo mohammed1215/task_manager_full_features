@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTaskWatcherDto } from './dto/create-task-watcher.dto';
-import { UpdateTaskWatcherDto } from './dto/update-task-watcher.dto';
+import { CreateTaskWatcherDto } from './dto/create-task-watcher.dto.ts';
+import { UpdateTaskWatcherDto } from './dto/update-task-watcher.dto.ts';
 
 @Injectable()
 export class TaskWatcherService {

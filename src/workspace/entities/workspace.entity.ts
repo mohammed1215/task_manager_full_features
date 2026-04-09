@@ -1,7 +1,7 @@
-import { User } from "src/user/entities/user.entity";
-import { WorkspaceMember } from "src/workspace-member/entities/workspace-member.entity";
+import { User } from "../../user/entities/user.entity.ts";
+import { WorkspaceMember } from "../../workspace-member/entities/workspace-member.entity.ts";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Board } from "src/board/entities/board.entity"
+import { Board } from "../../board/entities/board.entity.ts"
 
 @Entity()
 export class Workspace {

@@ -3,7 +3,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { SentMessageInfo } from 'nodemailer';
-import { WorkspaceMember } from 'src/workspace-member/entities/workspace-member.entity';
+import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity.ts';
 
 @Injectable()
 export class MailService {

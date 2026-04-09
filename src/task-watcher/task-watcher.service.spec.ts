@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TaskWatcherService } from './task-watcher.service';
+import { TaskWatcherService } from './task-watcher.service.ts';
 
 describe('TaskWatcherService', () => {
   let service: TaskWatcherService;

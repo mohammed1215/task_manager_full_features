@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { TaskAssigneeService } from './task-assignee.service';
-import { CreateTaskAssigneeDto } from './dto/create-task-assignee.dto';
-import { UpdateTaskAssigneeDto } from './dto/update-task-assignee.dto';
+import { TaskAssigneeService } from './task-assignee.service.ts';
+import { CreateTaskAssigneeDto } from './dto/create-task-assignee.dto.ts';
+import { UpdateTaskAssigneeDto } from './dto/update-task-assignee.dto.ts';
 
 @Controller('task-assignee')
 export class TaskAssigneeController {

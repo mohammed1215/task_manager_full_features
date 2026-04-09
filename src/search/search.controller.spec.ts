@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SearchController } from './search.controller';
-import { SearchService } from './search.service';
+import { SearchController } from './search.controller.ts';
+import { SearchService } from './search.service.ts';
 
 describe('SearchController', () => {
   let controller: SearchController;

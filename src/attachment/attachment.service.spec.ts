@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AttachmentService } from './attachment.service';
+import { AttachmentService } from './attachment.service.ts';
 
 describe('AttachmentService', () => {
   let service: AttachmentService;

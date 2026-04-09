@@ -1,14 +1,14 @@
 import { BadRequestException, forwardRef, Module } from '@nestjs/common';
-import { UserService } from './user.service';
-import { UserController } from './user.controller';
+import { UserService } from './user.service.ts';
+import { UserController } from './user.controller.ts';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
-import { AuthModule } from 'src/auth/auth.module';
+import { User } from './entities/user.entity.ts';
+import { AuthModule } from '../auth/auth.module.ts';
 import { MulterModule } from '@nestjs/platform-express';
 import multer from 'multer';
 import { existsSync, mkdirSync } from 'fs';
-import { Activity } from 'src/activity/entities/activity.entity';
-import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
+import { Activity } from '../activity/entities/activity.entity.ts';
+import { CloudinaryModule } from '../cloudinary/cloudinary.module.ts';
 
 @Module({
   controllers: [UserController],

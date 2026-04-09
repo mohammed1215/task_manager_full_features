@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { TaskAssigneeService } from './task-assignee.service';
-import { TaskAssigneeController } from './task-assignee.controller';
+import { TaskAssigneeService } from './task-assignee.service.ts';
+import { TaskAssigneeController } from './task-assignee.controller.ts';
 
 @Module({
   controllers: [TaskAssigneeController],

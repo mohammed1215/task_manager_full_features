@@ -1,12 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UploadedFile, UploadedFiles, UseInterceptors, MaxFileSizeValidator, ParseFilePipe, FileTypeValidator } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { UserService } from './user.service.ts';
+import { CreateUserDto } from './dto/create-user.dto.ts';
+import { UpdateUserDto } from './dto/update-user.dto.ts';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from './decorator/user.decorator';
-import { type jwtPayload } from 'src/interface/jwt-payload.interface';
-import { UpdateProfileDto } from './dto/update-profile.dto';
-import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { User } from './decorator/user.decorator.ts';
+import { type jwtPayload } from '../interface/jwt-payload.interface.ts';
+import { UpdateProfileDto } from './dto/update-profile.dto.ts';
+import { JwtGuard } from '../auth/guard/jwt.guard.ts';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiConsumes, ApiBody } from '@nestjs/swagger';
 
