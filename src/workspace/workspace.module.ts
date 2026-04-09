@@ -1,13 +1,13 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { WorkspaceService } from './workspace.service.ts';
-import { WorkspaceController } from './workspace.controller.ts';
+import { WorkspaceService } from './workspace.service';
+import { WorkspaceController } from './workspace.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Workspace } from './entities/workspace.entity.ts';
-import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity.ts';
-import { UserModule } from '../user/user.module.ts';
-import { AppModule } from '../app.module.ts';
-import { Invitation } from './entities/invitation.entity.ts';
-import { Activity } from '../activity/entities/activity.entity.ts';
+import { Workspace } from './entities/workspace.entity';
+import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity';
+import { UserModule } from '../user/user.module';
+import { AppModule } from '../app.module';
+import { Invitation } from './entities/invitation.entity';
+import { Activity } from '../activity/entities/activity.entity';
 
 @Module({
   controllers: [WorkspaceController],

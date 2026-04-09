@@ -1,16 +1,16 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateCommentDto } from './dto/create-comment.dto.ts';
-import { UpdateCommentDto } from './dto/update-comment.dto.ts';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Or, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Comment } from './entities/comment.entity.ts';
-import { Task } from '../task/entities/task.entity.ts';
-import { BoardService } from '../board/board.service.ts';
-import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity.ts';
-import { Board } from '../board/entities/board.entity.ts';
-import { BoardMember } from '../board/entities/board-member.entity.ts';
-import { WorkspaceMemberRoles } from '../workspace-member/enum/WorkspaceMember.enum.ts';
-import { TaskWatcher } from '../task-watcher/entities/task-watcher.entity.ts';
+import { Comment } from './entities/comment.entity';
+import { Task } from '../task/entities/task.entity';
+import { BoardService } from '../board/board.service';
+import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity';
+import { Board } from '../board/entities/board.entity';
+import { BoardMember } from '../board/entities/board-member.entity';
+import { WorkspaceMemberRoles } from '../workspace-member/enum/WorkspaceMember.enum';
+import { TaskWatcher } from '../task-watcher/entities/task-watcher.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
@@ -24,7 +24,7 @@ export class CommentService {
     @InjectRepository(TaskWatcher) private readonly taskWatcherRepo:Repository<TaskWatcher>,
     private readonly eventEmitter:EventEmitter2
   ){}
-  
+
   // TODO: Comment supports plain text and mentions (@username)
   async create(userId:string,taskId:string,createCommentDto: CreateCommentDto) {
 
@@ -33,7 +33,7 @@ export class CommentService {
     //check if task exists
     const task = await this.taskRepo.findOne({where:{id:taskId},relations:['board','board.workspace','column','assignedTasks']})
     if(!task) throw new NotFoundException('task not found')
-    
+
     // check if user is member+ in the board or admin or owner of the workspace
     const isBoardMember = await this.boardRepo.findOne({where:{
       board: {id: task.board.id},
@@ -49,7 +49,7 @@ export class CommentService {
     {
       user: {id:userId},
       workspace: {id:task.board.workspace.id},
-      role: WorkspaceMemberRoles.owner 
+      role: WorkspaceMemberRoles.owner
     }
     ]})
 
@@ -86,14 +86,14 @@ export class CommentService {
           emailPreference:watcher.user.emailPreference
         })
       }
-      
+
     }
 
     return savedComment;
   }
 
   findAll(taskId:string,page:number,limit:number) {
-    
+
     return this.commentRepo.find({
       where:{
         task: {id:taskId},
@@ -142,7 +142,7 @@ export class CommentService {
     },relations:['author','task','task.board','task.board.workspace']})
 
     if(!comment) throw new NotFoundException('comment not found')
-    
+
       //get user
       const workspaceMember = await this.workMemberRepo.findOne({where:{user:{id:userId},workspace:{id:comment.task.board.workspace.id}}})
       if(!workspaceMember) throw new NotFoundException('member not in the workspace')
@@ -153,7 +153,7 @@ export class CommentService {
       await this.commentRepo.delete({
         id:commentId
       })
-      
+
     return {message:"comment has been deleted successfully"};
   }
 }

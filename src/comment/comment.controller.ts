@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseUUIDPipe, Query, DefaultValuePipe, ParseIntPipe } from '@nestjs/common';
-import { CommentService } from './comment.service.ts';
-import { CreateCommentDto } from './dto/create-comment.dto.ts';
-import { UpdateCommentDto } from './dto/update-comment.dto.ts';
-import { JwtGuard } from '../auth/guard/jwt.guard.ts';
-import { User } from '../user/decorator/user.decorator.ts';
-import { type jwtPayload } from '../interface/jwt-payload.interface.ts';
-import { ParsePositivePipe } from '../Pipes/parse-positive.pipe.ts';
+import { CommentService } from './comment.service';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
+import { JwtGuard } from '../auth/guard/jwt.guard';
+import { User } from '../user/decorator/user.decorator';
+import { type jwtPayload } from '../interface/jwt-payload.interface';
+import { ParsePositivePipe } from '../Pipes/parse-positive.pipe';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('Comments')

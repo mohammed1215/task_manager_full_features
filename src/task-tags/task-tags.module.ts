@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { TaskTagsService } from './task-tags.service.ts';
-import { TaskTagsController } from './task-tags.controller.ts';
+import { TaskTagsService } from './task-tags.service';
+import { TaskTagsController } from './task-tags.controller';
 
 @Module({
   controllers: [TaskTagsController],

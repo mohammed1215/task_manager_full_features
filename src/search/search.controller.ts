@@ -1,9 +1,9 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { SearchService } from './search.service.ts';
-import { JwtGuard } from '../auth/guard/jwt.guard.ts';
-import { SearchQueryDto } from './dto/query-search.dto.ts';
-import { type jwtPayload } from '../interface/jwt-payload.interface.ts';
-import { User } from '../user/decorator/user.decorator.ts';
+import { SearchService } from './search.service';
+import { JwtGuard } from '../auth/guard/jwt.guard';
+import { SearchQueryDto } from './dto/query-search.dto';
+import { type jwtPayload } from '../interface/jwt-payload.interface';
+import { User } from '../user/decorator/user.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 
 @ApiTags('Search')

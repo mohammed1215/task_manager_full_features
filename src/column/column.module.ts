@@ -1,10 +1,10 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { ColumnService } from './column.service.ts';
-import { ColumnController } from './column.controller.ts';
+import { ColumnService } from './column.service';
+import { ColumnController } from './column.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ColumnEntity } from './entities/column.entity.ts';
-import { BoardModule } from '../board/board.module.ts';
-import { TaskModule } from '../task/task.module.ts';
+import { ColumnEntity } from './entities/column.entity';
+import { BoardModule } from '../board/board.module';
+import { TaskModule } from '../task/task.module';
 
 @Module({
   controllers: [ColumnController],

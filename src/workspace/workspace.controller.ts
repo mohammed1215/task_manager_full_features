@@ -1,12 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query, DefaultValuePipe, ParseIntPipe, BadRequestException } from '@nestjs/common';
-import { WorkspaceService } from './workspace.service.ts';
-import { CreateWorkspaceDto } from './dto/create-workspace.dto.ts';
-import { UpdateWorkspaceDto } from './dto/update-workspace.dto.ts';
-import { JwtGuard } from '../auth/guard/jwt.guard.ts';
-import { User } from '../user/decorator/user.decorator.ts';
-import { type jwtPayload } from '../interface/jwt-payload.interface.ts';
-import { CreateInvitationDto } from './dto/create-invitation.dto.ts';
-import { WorkspaceMemberRoles } from '../workspace-member/enum/WorkspaceMember.enum.ts';
+import { WorkspaceService } from './workspace.service';
+import { CreateWorkspaceDto } from './dto/create-workspace.dto';
+import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
+import { JwtGuard } from '../auth/guard/jwt.guard';
+import { User } from '../user/decorator/user.decorator';
+import { type jwtPayload } from '../interface/jwt-payload.interface';
+import { CreateInvitationDto } from './dto/create-invitation.dto';
+import { WorkspaceMemberRoles } from '../workspace-member/enum/WorkspaceMember.enum';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('Workspaces')

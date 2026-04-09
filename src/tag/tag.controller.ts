@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { TagService } from './tag.service.ts';
-import { CreateTagDto } from './dto/create-tag.dto.ts';
-import { UpdateTagDto } from './dto/update-tag.dto.ts';
+import { TagService } from './tag.service';
+import { CreateTagDto } from './dto/create-tag.dto';
+import { UpdateTagDto } from './dto/update-tag.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('Tags')

@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { TaskWatcherService } from './task-watcher.service.ts';
-import { CreateTaskWatcherDto } from './dto/create-task-watcher.dto.ts';
-import { UpdateTaskWatcherDto } from './dto/update-task-watcher.dto.ts';
+import { TaskWatcherService } from './task-watcher.service';
+import { CreateTaskWatcherDto } from './dto/create-task-watcher.dto';
+import { UpdateTaskWatcherDto } from './dto/update-task-watcher.dto';
 
 @Controller('task-watcher')
 export class TaskWatcherController {

@@ -1,33 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import { CreateActivityDto } from './dto/create-activity.dto.ts';
-import { UpdateActivityDto } from './dto/update-activity.dto.ts';
+import { CreateActivityDto } from './dto/create-activity.dto';
+import { UpdateActivityDto } from './dto/update-activity.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Activity } from './entities/activity.entity.ts';
+import { Activity } from './entities/activity.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class ActivityService {
   constructor(
-    @InjectRepository(Activity) private readonly activityRepo:Repository<Activity>
-  ){}
+    @InjectRepository(Activity)
+    private readonly activityRepo: Repository<Activity>,
+  ) {}
 
   create(createActivityDto: CreateActivityDto) {
     return 'This action adds a new activity';
   }
 
-  async findAll(userId:string,taskId:string,page:number,limit:number) {
-    const [activities,count] = await this.activityRepo.findAndCount({
-      where:{
-        task:{id:taskId},        
+  async findAll(userId: string, taskId: string, page: number, limit: number) {
+    const [activities, count] = await this.activityRepo.findAndCount({
+      where: {
+        task: { id: taskId },
       },
       take: limit,
       skip: (page - 1) * limit,
-      relations:['task','actor'],
-      order:{
-        createdAt:'DESC'
-      }
-    })
-    return {activities,pageCount: Math.ceil(count/limit),repoCount: count};
+      relations: ['task', 'actor'],
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+    return {
+      activities,
+      pageCount: Math.ceil(count / limit),
+      repoCount: count,
+    };
   }
 
   // findOne(id: number) {

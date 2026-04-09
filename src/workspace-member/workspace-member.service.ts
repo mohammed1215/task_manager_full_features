@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateWorkspaceMemberDto } from './dto/create-workspace-member.dto.ts';
-import { UpdateWorkspaceMemberDto } from './dto/update-workspace-member.dto.ts';
+import { CreateWorkspaceMemberDto } from './dto/create-workspace-member.dto';
+import { UpdateWorkspaceMemberDto } from './dto/update-workspace-member.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { WorkspaceMember } from './entities/workspace-member.entity.ts';
+import { WorkspaceMember } from './entities/workspace-member.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()

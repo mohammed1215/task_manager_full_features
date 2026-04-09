@@ -1,14 +1,18 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { AuthController } from './auth.controller.ts';
-import { AuthService } from './auth.service.ts';
-import { UserModule } from '../user/user.module.ts';
-import { AppModule } from '../app.module.ts';
-import { JwtStrategy } from './jwt.strategy.ts';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { UserModule } from '../user/user.module';
+import { AppModule } from '../app.module';
+import { JwtStrategy } from './jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
   controllers: [AuthController],
-  providers: [AuthService,JwtStrategy],
-  imports: [forwardRef(()=>UserModule),forwardRef(()=>AppModule),PassportModule],
+  providers: [AuthService, JwtStrategy],
+  imports: [
+    forwardRef(() => UserModule),
+    forwardRef(() => AppModule),
+    PassportModule,
+  ],
 })
 export class AuthModule {}

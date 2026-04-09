@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTaskAssigneeDto } from './dto/create-task-assignee.dto.ts';
-import { UpdateTaskAssigneeDto } from './dto/update-task-assignee.dto.ts';
+import { CreateTaskAssigneeDto } from './dto/create-task-assignee.dto';
+import { UpdateTaskAssigneeDto } from './dto/update-task-assignee.dto';
 
 @Injectable()
 export class TaskAssigneeService {

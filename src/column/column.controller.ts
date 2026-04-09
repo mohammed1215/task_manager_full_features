@@ -1,15 +1,15 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Put } from '@nestjs/common';
-import { ColumnService } from './column.service.ts';
-import { CreateColumnDto } from './dto/create-column.dto.ts';
-import { UpdateColumnDto } from './dto/update-column.dto.ts';
-import { JwtGuard } from '../auth/guard/jwt.guard.ts';
-import { User } from '../user/decorator/user.decorator.ts';
-import { type jwtPayload } from '../interface/jwt-payload.interface.ts';
-import { ReOrderColumnDto } from './dto/reorder-column.dto.ts';
-import { BoardService } from '../board/board.service.ts';
-import { UpdateBoardDto } from '../board/dto/update-board.dto.ts';
-import { TaskService } from '../task/task.service.ts';
-import { CreateTaskDto } from '../task/dto/create-task.dto.ts';
+import { ColumnService } from './column.service';
+import { CreateColumnDto } from './dto/create-column.dto';
+import { UpdateColumnDto } from './dto/update-column.dto';
+import { JwtGuard } from '../auth/guard/jwt.guard';
+import { User } from '../user/decorator/user.decorator';
+import { type jwtPayload } from '../interface/jwt-payload.interface';
+import { ReOrderColumnDto } from './dto/reorder-column.dto';
+import { BoardService } from '../board/board.service';
+import { UpdateBoardDto } from '../board/dto/update-board.dto';
+import { TaskService } from '../task/task.service';
+import { CreateTaskDto } from '../task/dto/create-task.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('Columns & Boards Management')

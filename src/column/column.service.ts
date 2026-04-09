@@ -1,13 +1,13 @@
 import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateColumnDto } from './dto/create-column.dto.ts';
-import { UpdateColumnDto } from './dto/update-column.dto.ts';
+import { CreateColumnDto } from './dto/create-column.dto';
+import { UpdateColumnDto } from './dto/update-column.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ColumnEntity } from './entities/column.entity.ts';
+import { ColumnEntity } from './entities/column.entity';
 import { Between, Not, Repository } from 'typeorm';
-import { BoardService } from '../board/board.service.ts';
-import { BoardRoles } from '../board/entities/board-member.entity.ts';
-import { ReOrderColumnDto } from './dto/reorder-column.dto.ts';
-import { TaskService } from '../task/task.service.ts';
+import { BoardService } from '../board/board.service';
+import { BoardRoles } from '../board/entities/board-member.entity';
+import { ReOrderColumnDto } from './dto/reorder-column.dto';
+import { TaskService } from '../task/task.service';
 
 @Injectable()
 export class ColumnService {

@@ -1,18 +1,18 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { CreateWorkspaceDto } from './dto/create-workspace.dto.ts';
-import { UpdateWorkspaceDto } from './dto/update-workspace.dto.ts';
+import { CreateWorkspaceDto } from './dto/create-workspace.dto';
+import { UpdateWorkspaceDto } from './dto/update-workspace.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Workspace } from './entities/workspace.entity.ts';
+import { Workspace } from './entities/workspace.entity';
 import { FindOptionsWhere, Not, Repository } from 'typeorm';
 import slugify from 'slugify';
-import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity.ts';
-import { WorkspaceMemberRoles } from '../workspace-member/enum/WorkspaceMember.enum.ts';
-import { CreateInvitationDto } from './dto/create-invitation.dto.ts';
-import { UserService } from '../user/user.service.ts';
-import { MailService } from '../mail/mail.service.ts';
-import { Invitation } from './entities/invitation.entity.ts';
+import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity';
+import { WorkspaceMemberRoles } from '../workspace-member/enum/WorkspaceMember.enum';
+import { CreateInvitationDto } from './dto/create-invitation.dto';
+import { UserService } from '../user/user.service';
+import { MailService } from '../mail/mail.service';
+import { Invitation } from './entities/invitation.entity';
 import { QueryRunner,DataSource } from 'typeorm';
-import { Activity, ActivityTypes } from '../activity/entities/activity.entity.ts';
+import { Activity, ActivityTypes } from '../activity/entities/activity.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 @Injectable()
 export class WorkspaceService {
