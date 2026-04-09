@@ -11,11 +11,9 @@ const server = express();
 let appReady: Promise<void> | null = null;
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(
-    AppModule,
-    new ExpressAdapter(server),
-    { logger: ['error', 'warn', 'log'] },
-  );
+  const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
+    logger: ['error', 'warn', 'log'],
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -25,9 +23,7 @@ async function bootstrap(): Promise<void> {
     }),
   );
 
-  app.useGlobalInterceptors(
-    new ClassSerializerInterceptor(app.get(Reflector)),
-  );
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   app.setGlobalPrefix('/api/v1/');
 
