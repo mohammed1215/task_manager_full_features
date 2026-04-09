@@ -14,14 +14,11 @@ import { Task } from '../task/entities/task.entity';
 import { BoardMember } from '../board/entities/board-member.entity';
 import { createReadStream, existsSync } from 'fs';
 import { ConfigService } from '@nestjs/config';
-import { loadEnvFile } from 'process';
 import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity';
 import { WorkspaceMemberRoles } from '../workspace-member/enum/WorkspaceMember.enum';
 import fs from 'fs';
 import { unlink } from 'fs/promises';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
-
-loadEnvFile();
 
 @Injectable()
 export class AttachmentService {
