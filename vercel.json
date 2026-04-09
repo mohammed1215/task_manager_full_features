@@ -1,5 +1,8 @@
 {
   "version": 2,
   "buildCommand": "npm run build:vercel",
+  "builds": {
+    "src": "src/main.ts"
+  },
   "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
 }
