@@ -26,7 +26,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document); // The URL where the
 
-  const port = process.env.PORT || 3001;
   // Add '0.0.0.0' as the second parameter
   await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
   console.log(`Application is running on: ${await app.getUrl()}`);

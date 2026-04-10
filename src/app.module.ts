@@ -53,6 +53,7 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
     WorkspaceMemberModule,
     ConfigModule.forRoot({
       isGlobal: true,
+      ignoreEnvFile: process.env.NODE_ENV === 'production',
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
