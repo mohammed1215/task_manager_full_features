@@ -1,5 +1,22 @@
 {
   "version": 2,
   "buildCommand": "npm run build:vercel",
+  "redirects": [
+    {
+      "source": "/api/docs/swagger-ui-bundle.js",
+      "destination": "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.js",
+      "permanent": true
+    },
+    {
+      "source": "/api/docs/swagger-ui-standalone-preset.js",
+      "destination": "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-standalone-preset.js",
+      "permanent": true
+    },
+    {
+      "source": "/api/docs/swagger-ui.css",
+      "destination": "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css",
+      "permanent": true
+    }
+  ],
   "rewrites": [{ "source": "/(.*)", "destination": "/api/index.js" }]
 }
