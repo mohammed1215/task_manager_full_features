@@ -1,7 +1,7 @@
 {
   "version": 2,
   "buildCommand": "npm run build:vercel",
-  "redirects": [
+  //"redirects": [
     {
       "source": "/api/docs/swagger-ui-bundle.js",
       "destination": "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.js",
