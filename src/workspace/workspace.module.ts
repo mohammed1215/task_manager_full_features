@@ -12,10 +12,15 @@ import { Activity } from '../activity/entities/activity.entity';
 @Module({
   controllers: [WorkspaceController],
   providers: [WorkspaceService],
-  imports:[
-  TypeOrmModule.forFeature([Workspace,WorkspaceMember,Invitation,Activity]),
-  UserModule,
-  forwardRef(()=>AppModule)
-]
+  imports: [
+    TypeOrmModule.forFeature([
+      Workspace,
+      WorkspaceMember,
+      Invitation,
+      Activity,
+    ]),
+    UserModule,
+    forwardRef(() => AppModule),
+  ],
 })
 export class WorkspaceModule {}

@@ -1,32 +1,41 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { Board } from "./board.entity";
-import { User } from "../../user/entities/user.entity";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Unique,
+} from 'typeorm';
+import { Board } from './board.entity';
+import { User } from '../../user/entities/user.entity';
 
-export enum BoardRoles{
-    ADMIN='ADMIN',
-    VIEWER='VIEWER',
-    MEMBER='MEMBER'
+export enum BoardRoles {
+  ADMIN = 'ADMIN',
+  VIEWER = 'VIEWER',
+  MEMBER = 'MEMBER',
 }
 
 @Entity()
-@Unique(['user','board'])
-export class BoardMember{
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+@Unique(['user', 'board'])
+export class BoardMember {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column({type:'enum',enum:BoardRoles,default:BoardRoles.MEMBER})
-    role:BoardRoles;
+  @Column({ type: 'enum', enum: BoardRoles, default: BoardRoles.MEMBER })
+  role: BoardRoles;
 
-    @CreateDateColumn()
-    joinedAt:Date;
+  @CreateDateColumn()
+  joinedAt: Date;
 
-    // relations
-    @ManyToOne(()=>Board,board=>board.members,{onDelete:'CASCADE'})
-    board:Board;
+  // relations
+  @ManyToOne(() => Board, (board) => board.members, { onDelete: 'CASCADE' })
+  board: Board;
 
-    @ManyToOne(()=>User,board=>board.boardMembership,{onDelete:'CASCADE'})
-    user:User;
+  @ManyToOne(() => User, (board) => board.boardMembership, {
+    onDelete: 'CASCADE',
+  })
+  user: User;
 
-    @ManyToOne(()=>User,(user)=>user.sentBoardInvitations)
-    invitedBy:User;
+  @ManyToOne(() => User, (user) => user.sentBoardInvitations)
+  invitedBy: User | null;
 }
