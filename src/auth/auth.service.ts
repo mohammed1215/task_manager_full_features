@@ -96,6 +96,7 @@ export class AuthService {
         //remove lock if exists
         if (user.lockUntil && user.lockUntil < new Date()) {
             user.lockUntil = null;
+            user.failedLoginAttempts = 0;
             await this.userRepo.save(user);
         }
         // return the token
