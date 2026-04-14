@@ -3,18 +3,35 @@ import { AppModule } from './app.module';
 import { ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ExpressAdapter } from '@nestjs/platform-express';
+import {
+  ExpressAdapter,
+  NestExpressApplication,
+} from '@nestjs/platform-express';
 import express, { Request, Response } from 'express';
+import { join } from 'path';
 
 const server = express();
 
 let appReady: Promise<void> | null = null;
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(server), {
-    logger: ['error', 'warn', 'log'],
-  });
-
+  const app = await NestFactory.create<NestExpressApplication>(
+    AppModule,
+    new ExpressAdapter(server),
+    {
+      logger: ['error', 'warn', 'log'],
+    },
+  );
+  app.setBaseViewsDir(join(__dirname, 'templates'));
+  app.useStaticAssets(join(__dirname, 'public'));
+  console.log(__dirname);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      forbidNonWhitelisted: true,
+      whitelist: true,
+      transform: true,
+    }),
+  );
   app.useGlobalPipes(
     new ValidationPipe({
       forbidNonWhitelisted: true,
@@ -28,7 +45,7 @@ async function bootstrap(): Promise<void> {
   app.setGlobalPrefix('/api/v1/');
 
   app.enableCors({
-    origin: ['*', process.env.FRONTEND_URL, 'http://localhost:5173'],
+    origin: ['*', process.env.FRONTEND_URL as string, 'http://localhost:5173'],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
     credentials: true,
   });
