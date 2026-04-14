@@ -46,6 +46,9 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { SearchModule } from './search/search.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { join } from 'path';
+
 @Module({
   imports: [
     UserModule,
@@ -107,6 +110,13 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module';
             auth: {
               user: config.get<string>('MAIL_USER'),
               pass: config.get<string>('MAIL_PASSWORD'),
+            },
+          },
+          template: {
+            adapter: new HandlebarsAdapter(),
+            dir: join(__dirname, 'templates'),
+            options: {
+              strict: true,
             },
           },
         };

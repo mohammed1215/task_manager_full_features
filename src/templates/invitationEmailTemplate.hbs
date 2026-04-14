@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Workspace Invitation</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f7;
+                color: #333333;
+            }
+            .container {
+                width: 100%;
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 24px;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            }
+            .header {
+                margin-bottom: 24px;
+            }
+            .button {
+                display: inline-block;
+                padding: 12px 20px;
+                margin: 0 8px 8px 0;
+                border-radius: 6px;
+                text-decoration: none;
+                color: #ffffff;
+                font-weight: 600;
+            }
+            .accept {
+                background-color: #28a745;
+            }
+            .decline {
+                background-color: #dc3545;
+            }
+            .footer {
+                margin-top: 24px;
+                font-size: 14px;
+                color: #666666;
+            }
+            .fallback {
+                word-break: break-all;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Workspace Invitation</h1>
+            </div>
+
+            <p>You are invited to join the workspace:</p>
+            <h2>{{workspaceName}}</h2>
+
+            <p>
+                Please choose one of the options below to respond to the invitation.
+            </p>
+
+            <p>
+                <a
+                    class="button accept"
+                    href="{{frontendUrl}}/accept-invite?invitationId={{invitationId}}&senderId={{senderId}}"
+                >
+                    Accept Invitation
+                </a>
+                <a
+                    class="button decline"
+                    href="{{frontendUrl}}/decline-invite?invitationId={{invitationId}}&senderId={{senderId}}"
+                >
+                    Decline Invitation
+                </a>
+            </p>
+
+            <div class="footer">
+                <p>If the buttons do not work, copy and paste one of these links into your browser:</p>
+                <p class="fallback">
+                    Accept:
+                    <a href="{{frontendUrl}}/accept-invite?invitationId={{invitationId}}&senderId={{senderId}}">
+                        {{frontendUrl}}/accept-invite?invitationId={{invitationId}}&senderId={{senderId}}
+                    </a>
+                </p>
+                <p class="fallback">
+                    Decline:
+                    <a href="{{frontendUrl}}/decline-invite?invitationId={{invitationId}}&senderId={{senderId}}">
+                        {{frontendUrl}}/decline-invite?invitationId={{invitationId}}&senderId={{senderId}}
+                    </a>
+                </p>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,71 @@
+<html lang='en'>
+    <head>
+        <meta charset='UTF-8' />
+        <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+        <title>Workspace Deletion Notification</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+                background-color: #f4f4f7;
+                color: #333333;
+            }
+            .container {
+                width: 100%;
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 24px;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            }
+            .header {
+                margin-bottom: 24px;
+                border-bottom: 3px solid #dc3545;
+                padding-bottom: 16px;
+            }
+            .header h2 {
+                margin: 0;
+                color: #dc3545;
+                font-size: 24px;
+            }
+            .content {
+                margin: 24px 0;
+                line-height: 1.6;
+            }
+            .workspace-name {
+                font-weight: bold;
+                color: #007bff;
+                font-size: 18px;
+            }
+            .footer {
+                margin-top: 24px;
+                padding-top: 16px;
+                border-top: 1px solid #e0e0e0;
+                font-size: 12px;
+                color: #999999;
+            }
+        </style>
+    </head>
+    <body>
+        <div class='container'>
+            <div class='header'>
+                <h2>Workspace Deleted</h2>
+            </div>
+            <div class='content'>
+                <p>Hello,</p>
+                <p>We are writing to inform you that the workspace
+                    <span class='workspace-name'>"{{workspaceName}}"</span>
+                    has been permanently deleted.</p>
+                <p>All associated data, tasks, and documents in this workspace
+                    are no longer accessible.</p>
+                <p>If you believe this was done in error or have any questions,
+                    please contact the workspace administrator.</p>
+            </div>
+            <div class='footer'>
+                <p>Best regards,<br />Task Manager Team</p>
+            </div>
+        </div>
+    </body>
+</html>
