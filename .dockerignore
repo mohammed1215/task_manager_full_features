@@ -1,0 +1,31 @@
+# Dependency directories
+node_modules
+dist
+.pnpm-debug.log
+dist-single
+# Version control & CI/CD
+.git
+.github
+.gitignore
+
+pnpm-debug.log
+# Editor settings (Exclude these)
+.vscode
+.zed
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.*
+
+
+fix_imports.py
+fix_src_imports.py
+

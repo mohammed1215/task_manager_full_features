@@ -1,0 +1,17 @@
+services:
+    api:
+        build: .
+        ports:
+            - '3000:3000'
+        env_file:
+            - .env
+        depends_on:
+            - db
+    db:
+        image: postgres:15
+        environment:
+            POSTGRES_USER: user
+            POSTGRES_PASSWORD: password
+            POSTGRES_DB: cliniq_db
+        ports:
+            - '5432:5432'
