@@ -10,7 +10,11 @@ import { BoardMember } from './entities/board-member.entity';
 @Module({
   controllers: [BoardController],
   providers: [BoardService],
-  imports: [TypeOrmModule.forFeature([Board,BoardMember]),WorkspaceMemberModule,forwardRef(()=>ColumnModule)],
-  exports:[BoardService]
+  imports: [
+    TypeOrmModule.forFeature([Board, BoardMember]),
+    WorkspaceMemberModule,
+    forwardRef(() => ColumnModule),
+  ],
+  exports: [BoardService],
 })
 export class BoardModule {}

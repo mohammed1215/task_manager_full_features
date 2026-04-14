@@ -12,6 +12,7 @@ import { BoardMember } from '../board/entities/board-member.entity';
 import { Activity } from '../activity/entities/activity.entity';
 import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
+import { ActivityModule } from '../activity/activity.module';
 @Module({
   controllers: [AttachmentController],
   providers: [AttachmentService],
@@ -72,6 +73,7 @@ import { CloudinaryModule } from '../cloudinary/cloudinary.module';
       WorkspaceMember,
     ]),
     CloudinaryModule,
+    ActivityModule
   ],
 })
 export class AttachmentModule {}

@@ -10,7 +10,7 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Board, Visibility } from './entities/board.entity';
-import { Not, Repository } from 'typeorm';
+import { EntityManager, Not, QueryRunner, Repository } from 'typeorm';
 import { WorkspaceMemberService } from '../workspace-member/workspace-member.service';
 import { ColumnService } from '../column/column.service';
 import { DataSource } from 'typeorm';
@@ -32,18 +32,23 @@ export class BoardService {
     userId: string,
     workspaceId: string,
     createBoardDto: CreateBoardDto,
+    queryRunnerPass?: QueryRunner,
   ) {
-    //check if user in workspace
-    const member = await this.workspaceMemberService.findOne(
-      workspaceId,
-      userId,
-    );
-
     //create query runner
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
+    const queryRunner = queryRunnerPass || this.dataSource.createQueryRunner();
+    if (!queryRunnerPass) {
+      await queryRunner.connect();
+      await queryRunner.startTransaction();
+    }
+
     try {
+      //check if user in workspace
+      const member = await this.workspaceMemberService.findOneWithManager(
+        workspaceId,
+        userId,
+        queryRunner.manager,
+      );
+
       //create board
       const board = queryRunner.manager.create(Board, {
         ...createBoardDto,
@@ -102,7 +107,9 @@ export class BoardService {
       await queryRunner.manager.save(boardMember);
 
       // commit transaction
-      await queryRunner.commitTransaction();
+      if (!queryRunnerPass) {
+        await queryRunner.commitTransaction();
+      }
       return {
         message: 'board created successfully',
         board: {
@@ -111,12 +118,23 @@ export class BoardService {
         },
       };
     } catch (error) {
-      await queryRunner.rollbackTransaction();
+      if (!queryRunnerPass) {
+        await queryRunner.rollbackTransaction();
+      }
       throw error;
     } finally {
-      await queryRunner.release();
+      if (!queryRunnerPass) {
+        await queryRunner.release();
+      }
     }
   }
+
+  // async createWithManager(
+  //   manager: EntityManager,
+  //   userId: string,
+  //   workspaceId: string,
+  //   createBoardDto: CreateBoardDto,
+  // ) {}
 
   async archiveBoard(userId: string, boardId: string) {
     const user = await this.checkAdminRoleOfBoardMemberUser(

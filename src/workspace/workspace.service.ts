@@ -22,6 +22,7 @@ import { Activity } from '../activity/entities/activity.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { BoardMember, BoardRoles } from '../board/entities/board-member.entity';
 import { Board, Visibility } from '../board/entities/board.entity';
+import { BoardService } from '../board/board.service';
 
 @Injectable()
 export class WorkspaceService {
@@ -38,40 +39,66 @@ export class WorkspaceService {
     private readonly mailService: MailService,
     private readonly userService: UserService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly boardService: BoardService,
   ) {}
   async create(userId: string, createWorkspaceDto: CreateWorkspaceDto) {
-    //create slug
-    const slug = slugify(createWorkspaceDto.name, { lower: true });
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      //create slug
+      const slug = slugify(createWorkspaceDto.name, { lower: true });
 
-    //create workspace
-    const workspace = this.workspaceRepo.create({
-      ...createWorkspaceDto,
-      slug,
-      owner: { id: userId },
-    });
+      //create workspace
+      const workspace = queryRunner.manager.create(Workspace, {
+        ...createWorkspaceDto,
+        slug,
+        owner: { id: userId },
+      });
+      //save workspace
+      const savedWorkspace = await queryRunner.manager.save(workspace);
 
-    //save workspace
-    const savedWorkspace = await this.workspaceRepo.save(workspace);
+      //create workspace_member
+      const workspaceMember = queryRunner.manager.create(WorkspaceMember, {
+        user: { id: userId },
+        workspace: savedWorkspace,
+        role: WorkspaceMemberRoles.owner,
+        invitedBy: { id: userId },
+      });
 
-    //create workspace_member
-    const workspaceMember = this.workspaceMemberRepo.create({
-      user: { id: userId },
-      workspace: savedWorkspace,
-      role: WorkspaceMemberRoles.owner,
-      invitedBy: { id: userId },
-    });
-    const savedWorkspaceMember =
-      await this.workspaceMemberRepo.save(workspaceMember);
-    return {
-      id: workspace.id,
-      name: workspace.name,
-      slug: workspace.slug,
-      description: workspace.description,
-      isPrivate: workspace.isPrivate,
-      ownerId: workspace.owner.id,
-      createdAt: workspace.createdAt,
-      memberCount: 1,
-    };
+      const savedWorkspaceMember =
+        await queryRunner.manager.save(workspaceMember);
+
+      //create default general board when workspace is created automatically
+      const { board: generalBoard } = await this.boardService.create(
+        userId,
+        savedWorkspace.id,
+        {
+          name: 'General',
+          description: 'General board created with the board',
+          visibility: Visibility.PUBLIC,
+          backgroundColor: '#000',
+        },
+        queryRunner,
+      );
+
+      await queryRunner.commitTransaction();
+      return {
+        id: workspace.id,
+        name: workspace.name,
+        slug: workspace.slug,
+        description: workspace.description,
+        isPrivate: workspace.isPrivate,
+        ownerId: workspace.owner.id,
+        createdAt: workspace.createdAt,
+        memberCount: 1,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async findAll(
@@ -334,7 +361,7 @@ export class WorkspaceService {
 
     //check if user is already in the workspace or not
     const existedUser = await this.workspaceMemberRepo.findOne({
-      where: { user: { id: user.id } },
+      where: { user: { id: user.id }, workspace: { id: workspace.id } },
       relations: ['workspace'],
     });
     if (existedUser)

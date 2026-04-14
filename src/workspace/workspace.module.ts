@@ -8,6 +8,7 @@ import { UserModule } from '../user/user.module';
 import { AppModule } from '../app.module';
 import { Invitation } from './entities/invitation.entity';
 import { Activity } from '../activity/entities/activity.entity';
+import { BoardModule } from '../board/board.module';
 
 @Module({
   controllers: [WorkspaceController],
@@ -20,6 +21,7 @@ import { Activity } from '../activity/entities/activity.entity';
       Activity,
     ]),
     UserModule,
+    forwardRef(() => BoardModule),
     forwardRef(() => AppModule),
   ],
 })

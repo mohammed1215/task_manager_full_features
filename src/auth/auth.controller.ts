@@ -2,8 +2,11 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Get,
   Post,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -14,7 +17,13 @@ import {
   ApiResponse,
   ApiBody,
   ApiQuery,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
+import { refreshJwtStrategy } from './refresh-jwt.strategy';
+import { AuthGuard } from '@nestjs/passport';
+import { type Request } from 'express';
+import { User } from '../user/decorator/user.decorator';
+import { type jwtPayload } from '../interface/jwt-payload.interface';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -121,6 +130,19 @@ export class AuthController {
     @Query('id') userId: string,
   ) {
     return this.authService.verifyEmail(verifyToken, userId);
+  }
+
+  @Post('refresh-token')
+  @UseGuards(AuthGuard('jwt-refresh'))
+  @ApiBody({
+    schema: {
+      properties: {
+        refreshToken: { type: 'string' },
+      },
+    },
+  })
+  async refreshToken(@User() user: jwtPayload) {
+    return this.authService.refreshToken(user);
   }
 
   /**User can request password reset via email

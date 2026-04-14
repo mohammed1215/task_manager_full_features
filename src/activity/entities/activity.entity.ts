@@ -34,11 +34,11 @@ export class Activity {
   @Column()
   fieldName: string;
 
-  @Column('json')
-  oldValue: string;
+  @Column('json', { nullable: true })
+  oldValue: string | null;
 
-  @Column('json')
-  newValue: string;
+  @Column('json', { nullable: true })
+  newValue: string | null;
 
   @CreateDateColumn()
   createdAt: Date;

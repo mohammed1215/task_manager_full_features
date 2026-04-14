@@ -4,6 +4,7 @@ import { UpdateWorkspaceMemberDto } from './dto/update-workspace-member.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { WorkspaceMember } from './entities/workspace-member.entity';
 import { Repository } from 'typeorm';
+import { EntityManager } from 'typeorm/browser';
 
 @Injectable()
 export class WorkspaceMemberService {
@@ -21,6 +22,18 @@ export class WorkspaceMemberService {
 
   async findOne(workspaceId: string, memberId: string) {
     const member = await this.workspaceMemberRepo.findOne({
+      where: { workspace: { id: workspaceId }, user: { id: memberId } },
+    });
+    if (!member) throw new NotFoundException('Member Not Found');
+    return member;
+  }
+
+  async findOneWithManager(
+    workspaceId: string,
+    memberId: string,
+    manager: EntityManager,
+  ) {
+    const member = await manager.findOne(WorkspaceMember, {
       where: { workspace: { id: workspaceId }, user: { id: memberId } },
     });
     if (!member) throw new NotFoundException('Member Not Found');

@@ -13,7 +13,14 @@ export class ActivityService {
   ) {}
 
   create(createActivityDto: CreateActivityDto) {
-    return 'This action adds a new activity';
+    const { taskId, actorId, ...activityData } = createActivityDto;
+    const activity = this.activityRepo.create({
+      ...activityData,
+      actor: { id: actorId },
+      task: { id: taskId },
+    });
+
+    return this.activityRepo.save(activity);
   }
 
   async findAll(userId: string, taskId: string, page: number, limit: number) {

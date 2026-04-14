@@ -92,6 +92,8 @@ export class ActivityController {
     return this.activityService.findAll(user.userId, taskId, page, limit);
   }
 
+  // @Post('tasks/:taskId/activity')
+
   // @Get(':id')
   // findOne(@Param('id') id: string) {
   //   return this.activityService.findOne(+id);

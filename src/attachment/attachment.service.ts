@@ -19,6 +19,8 @@ import { WorkspaceMemberRoles } from '../workspace-member/enum/WorkspaceMember.e
 import fs from 'fs';
 import { unlink } from 'fs/promises';
 import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { ActivityService } from '../activity/activity.service';
+import { ActivityTypes } from '../activity/entities/activity.entity';
 
 @Injectable()
 export class AttachmentService {
@@ -32,6 +34,7 @@ export class AttachmentService {
     private readonly workspaceRepo: Repository<WorkspaceMember>,
     private readonly config: ConfigService,
     private readonly cloudinaryService: CloudinaryService,
+    private readonly activityService: ActivityService,
   ) {}
   async create(
     userId: string,
@@ -92,7 +95,21 @@ export class AttachmentService {
           : `/${attachment.path}`,
         contentType: attachment.mimetype,
       });
-      return this.attachmentRepo.save(attachmentRow);
+
+      const createdAttachment = await this.attachmentRepo.save(attachmentRow);
+      await this.activityService.create({
+        activityType: ActivityTypes.attachmentAdded,
+        fieldName: 'attachment',
+        oldValue: null,
+        newValue: {
+          attachmentName: createdAttachment.filename,
+          size: createdAttachment.fileSize,
+        },
+
+        taskId: taskId,
+        actorId: userId,
+      });
+      return createdAttachment;
     } catch (error) {
       if (existsSync(attachment.path)) {
         await this.deleteLocalFile(attachment.path);
@@ -104,7 +121,7 @@ export class AttachmentService {
   async findAll(taskId: string) {
     //TODO: EDIT URL OF DOWNLOADING
     return {
-      attachments: this.attachmentRepo.find({
+      attachments: await this.attachmentRepo.find({
         where: {
           task: { id: taskId },
         },

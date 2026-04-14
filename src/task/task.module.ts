@@ -12,11 +12,27 @@ import { BoardMember } from '../board/entities/board-member.entity';
 import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity';
 import { AppModule } from '../app.module';
 import { User } from '../user/entities/user.entity';
+import { ActivityModule } from '../activity/activity.module';
 
 @Module({
   controllers: [TaskController],
   providers: [TaskService],
-  exports:[TaskService],
-  imports:[TypeOrmModule.forFeature([Task,TaskAssignee,ColumnEntity,Tag,TaskWatcher,BoardMember,WorkspaceMember,User]),forwardRef(()=>BoardModule),forwardRef(()=>AppModule)]
+  exports: [TaskService],
+  imports: [
+    TypeOrmModule.forFeature([
+      Task,
+      TaskAssignee,
+      ColumnEntity,
+      Tag,
+      TaskWatcher,
+      BoardMember,
+      WorkspaceMember,
+      User,
+    ]),
+    forwardRef(() => BoardModule),
+    forwardRef(() => AppModule),
+    ActivityModule,
+
+  ],
 })
 export class TaskModule {}

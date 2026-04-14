@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,6 +12,11 @@ import { JwtService } from '@nestjs/jwt';
 import { MailService } from '../mail/mail.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtProviderService } from '../jwt-provider/jwt-provider.service';
+import { jwtPayload } from '../interface/jwt-payload.interface';
+import { Repository } from 'typeorm';
+import { User } from '../user/entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -19,6 +25,7 @@ export class AuthService {
     private readonly mailService: MailService,
     private readonly config: ConfigService,
     private readonly jwtProvider: JwtProviderService,
+    @InjectRepository(User) private readonly userRepo: Repository<User>,
   ) {}
 
   async register(createUserDto: CreateUserDto) {
@@ -42,11 +49,20 @@ export class AuthService {
     // not found throw exception
     if (!user) throw new NotFoundException('user not found');
 
+    if (user.lockUntil && user.lockUntil > new Date()) {
+      throw new ForbiddenException(
+        'Account is temporarily locked. Try again later.',
+      );
+    }
+
     // if found compare hashed password with the password
     const result = await bcrypt.compare(loginDto.password, user.password);
 
     // if  false throw exception password isn't correct
-    if (!result) throw new BadRequestException('password is not correct');
+    if (!result) {
+      await this.handleFailedLogin(user);
+      throw new BadRequestException('password is not correct');
+    }
 
     //check if the email is verified or not
     if (!user.emailVerified) {
@@ -63,19 +79,22 @@ export class AuthService {
     }
 
     //generate access token
-    const accessToken = await this.jwtService.signAsync({
+    const accessToken = await this.jwtProvider.generateAccessToken({
       userId: user.id,
       email: user.email,
     });
 
     //generate refresh token
-    const refreshToken = await this.jwtService.signAsync(
-      { userId: user.id, email: user.email },
-      {
-        expiresIn: '30d',
-      },
-    );
+    const refreshToken = await this.jwtProvider.generateRefreshToken({
+      userId: user.id,
+      email: user.email,
+    });
 
+    //remove lock if exists
+    if (user.lockUntil && user.lockUntil < new Date()) {
+      user.lockUntil = null;
+      await this.userRepo.save(user);
+    }
     // return the token
     return { accessToken, refreshToken, user };
   }
@@ -117,7 +136,7 @@ export class AuthService {
 
   async resetPassword(resetToken: string, userId: string, newPassword: string) {
     //validate token
-    const payload = await this.jwtService.verifyAsync(resetToken, {
+    const payload = await this.jwtService.verifyAsync<jwtPayload>(resetToken, {
       secret: this.config.get<string>('RESET_SECRET_PASS'),
     });
 
@@ -136,5 +155,32 @@ export class AuthService {
 
     //return message
     return { message: 'password updated successfully' };
+  }
+
+  async refreshToken(payload: jwtPayload) {
+    // already validated using the jwt refresh strategy
+    //generate access token
+    const accessToken = await this.jwtProvider.generateAccessToken({
+      userId: payload.userId,
+      email: payload.email,
+    });
+
+    //generate new refresh token
+    const newRefreshToken = await this.jwtProvider.generateRefreshToken({
+      userId: payload.userId,
+      email: payload.email,
+    });
+    return { accessToken, refreshToken: newRefreshToken };
+  }
+  async handleFailedLogin(user: User) {
+    user.failedLoginAttempts++;
+
+    if (user.failedLoginAttempts >= 5) {
+      const lockTime = new Date();
+      lockTime.setMinutes(lockTime.getMinutes() + 15);
+      user.lockUntil = lockTime;
+    }
+
+    await this.userRepo.save(user);
   }
 }
