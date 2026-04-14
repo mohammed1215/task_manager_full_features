@@ -207,7 +207,7 @@ export class WorkspaceService {
   ) {
     if (!confirmation) throw new BadRequestException('Please Confirm Deletion');
 
-    const member = await this.workspaceMemberRepo.findOne({
+    const member = await this.workspaceMemberRepo.findOnee({
       where: { user: { id: userId }, workspace: { id: workspaceId } },
     });
     if (!member)
