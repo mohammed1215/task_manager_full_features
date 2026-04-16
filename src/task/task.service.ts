@@ -9,7 +9,7 @@ import {
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PriorityTask, Task } from './entities/task.entity';
+import { Task } from './entities/task.entity';
 import {
     Between,
     DeepPartial,
@@ -20,9 +20,7 @@ import {
     IsNull,
     LessThan,
     LessThanOrEqual,
-    Like,
     MoreThanOrEqual,
-    Not,
     Repository,
 } from 'typeorm';
 import { TaskAssignee } from '../task-assignee/entities/task-assignee.entity';
@@ -30,18 +28,22 @@ import { ColumnEntity } from '../column/entities/column.entity';
 import { Tag } from '../tag/entities/tag.entity';
 import { BoardService } from '../board/board.service';
 import { FindTasksQueryDto } from './dto/find-task-query.dto';
-import { BoardMember, BoardRoles } from '../board/entities/board-member.entity';
+import { BoardMember } from '../board/entities/board-member.entity';
 import { AssignUsersToTaskDto } from './dto/assign-users.dto';
 import { TaskWatcher } from '../task-watcher/entities/task-watcher.entity';
-import { Board } from '../board/entities/board.entity';
-import { MailService } from '../mail/mail.service';
+
 import { User } from '../user/entities/user.entity';
 import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity';
 import { MoveTaskDto } from './entities/move-task.dto';
-import { WorkspaceMemberRoles } from '../workspace-member/enum/WorkspaceMember.enum';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ActivityService } from '../activity/activity.service';
-import { ActivityTypes } from '../activity/entities/activity.entity';
+import {
+    ActivityTypes,
+    BoardRoles,
+    PriorityTask,
+    WorkspaceMemberRoles,
+} from '../enum/enum';
+
 export interface FILTER {
     columnId: string | undefined;
     assigneeId: string | undefined;
@@ -50,6 +52,7 @@ export interface FILTER {
     dueDateFrom: Date | undefined;
     dueDateTo: Date | undefined;
 }
+
 @Injectable()
 export class TaskService {
     constructor(

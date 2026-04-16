@@ -2,71 +2,66 @@ import { ColumnEntity } from '../../column/entities/column.entity';
 import { User } from '../../user/entities/user.entity';
 import { Workspace } from '../../workspace/entities/workspace.entity';
 import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
+    Column,
+    CreateDateColumn,
+    DeleteDateColumn,
+    Entity,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
 } from 'typeorm';
 import { BoardMember } from './board-member.entity';
 import { Task } from '../../task/entities/task.entity';
-
-export enum Visibility {
-  PUBLIC = 'PUBLIC',
-  PRIVATE = 'PRIVATE',
-  WORKSPACE = 'WORKSPACE',
-}
+import { Visibility } from '../../enum/enum';
 
 @Entity()
 export class Board {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
-  @Column()
-  name: string;
+    @Column()
+    name: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  description: string;
+    @Column({ type: 'varchar', nullable: true })
+    description: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  backgroundColor: string;
+    @Column({ type: 'varchar', nullable: true })
+    backgroundColor: string;
 
-  @Column({ default: false })
-  isArchived: boolean;
+    @Column({ default: false })
+    isArchived: boolean;
 
-  @CreateDateColumn()
-  createdAt: Date;
+    @CreateDateColumn()
+    createdAt: Date;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+    @UpdateDateColumn()
+    updatedAt: Date;
 
-  @Column('timestamp', { nullable: true })
-  archivedAt: Date | null;
+    @Column('timestamp', { nullable: true })
+    archivedAt: Date | null;
 
-  @Column({ type: 'varchar', default: Visibility.PRIVATE, enum: Visibility })
-  visibility: Visibility;
+    @Column({ type: 'enum', default: Visibility.PRIVATE, enum: Visibility })
+    visibility: Visibility;
 
-  @DeleteDateColumn()
-  deletedAt: Date;
+    @DeleteDateColumn()
+    deletedAt: Date;
 
-  // Relations
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  createdBy: User;
+    // Relations
+    @ManyToOne(() => User, { onDelete: 'CASCADE' })
+    createdBy: User;
 
-  @ManyToOne(() => Workspace, (workspace) => workspace.boards, {
-    onDelete: 'CASCADE',
-  })
-  workspace: Workspace;
+    @ManyToOne(() => Workspace, (workspace) => workspace.boards, {
+        onDelete: 'CASCADE',
+    })
+    workspace: Workspace;
 
-  @OneToMany(() => ColumnEntity, (column) => column.board)
-  columns: ColumnEntity[];
+    @OneToMany(() => ColumnEntity, (column) => column.board)
+    columns: ColumnEntity[];
 
-  @OneToMany(() => BoardMember, (boardMember) => boardMember.board)
-  members: BoardMember[];
+    @OneToMany(() => BoardMember, (boardMember) => boardMember.board)
+    members: BoardMember[];
 
-  @OneToMany(() => Task, (task) => task.board)
-  tasksOfBoard: Task[];
+    @OneToMany(() => Task, (task) => task.board)
+    tasksOfBoard: Task[];
 }

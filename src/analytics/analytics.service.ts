@@ -2,9 +2,10 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Workspace } from '../workspace/entities/workspace.entity';
 import { Repository } from 'typeorm';
-import { PriorityTask, Task } from '../task/entities/task.entity';
+import { Task } from '../task/entities/task.entity';
 import { Activity } from '../activity/entities/activity.entity';
 import { TaskAssignee } from '../task-assignee/entities/task-assignee.entity';
+import { PriorityTask } from '../enum/enum';
 
 type dashboardReponse = {
     totalTasks: number;

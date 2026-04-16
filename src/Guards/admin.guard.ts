@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
 import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity';
 import { Repository } from 'typeorm';
-import { WorkspaceMemberRoles } from '../workspace-member/enum/WorkspaceMember.enum';
+import { WorkspaceMemberRoles } from '../enum/enum';
 
 @Injectable()
 export class AdminWorkspaceGuard implements CanActivate {

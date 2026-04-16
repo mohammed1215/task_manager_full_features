@@ -12,7 +12,6 @@ import { Workspace } from './entities/workspace.entity';
 import { FindOptionsWhere, Not, Repository } from 'typeorm';
 import slugify from 'slugify';
 import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity';
-import { WorkspaceMemberRoles } from '../workspace-member/enum/WorkspaceMember.enum';
 import { CreateInvitationDto } from './dto/create-invitation.dto';
 import { UserService } from '../user/user.service';
 import { MailService } from '../mail/mail.service';
@@ -20,9 +19,10 @@ import { Invitation } from './entities/invitation.entity';
 import { DataSource } from 'typeorm';
 import { Activity } from '../activity/entities/activity.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { BoardMember, BoardRoles } from '../board/entities/board-member.entity';
-import { Board, Visibility } from '../board/entities/board.entity';
+import { BoardMember } from '../board/entities/board-member.entity';
+import { Board } from '../board/entities/board.entity';
 import { BoardService } from '../board/board.service';
+import { BoardRoles, Visibility, WorkspaceMemberRoles } from '../enum/enum';
 
 @Injectable()
 export class WorkspaceService {

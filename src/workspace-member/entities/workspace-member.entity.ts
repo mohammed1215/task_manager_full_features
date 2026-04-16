@@ -1,14 +1,18 @@
-import { EmailPreference, User } from '../../user/entities/user.entity';
+import { User } from '../../user/entities/user.entity';
 import { Workspace } from '../../workspace/entities/workspace.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { WorkspaceMemberRoles } from '../enum/WorkspaceMember.enum';
+import { EmailPreference, WorkspaceMemberRoles } from '../../enum/enum';
 
 @Entity()
 export class WorkspaceMember {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @Column({ type: 'enum', enum: WorkspaceMemberRoles })
+    @Column({
+        type: 'enum',
+        enum: WorkspaceMemberRoles,
+        enumName: 'WorkspaceMemberRolesEnum',
+    })
     role: WorkspaceMemberRoles;
 
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

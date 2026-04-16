@@ -1,3 +1,4 @@
+import { NotificationTypes } from '../../enum/enum';
 import { User } from '../../user/entities/user.entity';
 import {
     Column,
@@ -7,16 +8,6 @@ import {
     PrimaryGeneratedColumn,
 } from 'typeorm';
 
-export enum NotificationTypes {
-    TASK_ASSIGNED = 'TASK_ASSIGNED',
-    USER_MENTIONED = 'USER_MENTIONED',
-    TASK_DUE_SOON = 'TASK_DUE_SOON', // 24 hours
-    TASK_OVERDUE = 'TASK_OVERDUE',
-    WORKSPACE_INVITATION = 'WORKSPACE_INVITATION',
-    WATCHED_TASK_COMMENT = 'WATCHED_TASK_COMMENT',
-    TASK_UNASSIGNED = 'TASK_UNASSIGNED',
-}
-
 @Entity()
 export class Notification {
     @PrimaryGeneratedColumn('uuid')
@@ -25,9 +16,12 @@ export class Notification {
     @ManyToOne(() => User)
     user: User;
 
-    @Column('enum', { enum: NotificationTypes })
+    @Column({
+        type: 'enum',
+        enum: NotificationTypes,
+        enumName: 'NotificationTypesEnum',
+    })
     type: NotificationTypes;
-
     @Column()
     title: string;
 

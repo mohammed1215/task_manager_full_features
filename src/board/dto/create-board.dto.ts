@@ -1,6 +1,14 @@
-import { IsBoolean, IsEnum, IsHexColor, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { Visibility } from "../entities/board.entity";
-import { ApiProperty } from "@nestjs/swagger";
+import {
+    IsBoolean,
+    IsEnum,
+    IsHexColor,
+    IsNotEmpty,
+    IsOptional,
+    IsString,
+} from 'class-validator';
+
+import { ApiProperty } from '@nestjs/swagger';
+import { Visibility } from '../../enum/enum';
 
 export class CreateBoardDto {
     @ApiProperty({ example: 'Board 1' })
@@ -14,16 +22,15 @@ export class CreateBoardDto {
     @IsOptional()
     @ApiProperty({ example: 'Board 1 description' })
     description: string;
-    
+
     @IsString()
     @IsNotEmpty()
     @IsHexColor()
     @IsOptional()
-    @ApiProperty({ example: '#666', description:'should be hex color' })
+    @ApiProperty({ example: '#666', description: 'should be hex color' })
     backgroundColor: string;
-    
-    @IsEnum(Visibility)
-    @ApiProperty({example:'PUBLIC',enum:Visibility})
-    visibility: Visibility
-}
 
+    @IsEnum(Visibility)
+    @ApiProperty({ example: 'PUBLIC', enum: Visibility })
+    visibility: Visibility;
+}

@@ -17,12 +17,7 @@ import {
     UpdateDateColumn,
     OneToMany,
 } from 'typeorm';
-
-export enum EmailPreference {
-    IMMEDIATE = 'immediate',
-    DAILY_DIGEST = 'daily_digest',
-    DISABLED = 'disabled',
-}
+import { EmailPreference } from '../../enum/enum';
 
 @Entity()
 export class User {

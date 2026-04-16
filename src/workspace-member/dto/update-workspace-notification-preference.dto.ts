@@ -1,6 +1,6 @@
 import { IsEnum, IsOptional } from 'class-validator';
-import { EmailPreference } from '../../user/entities/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { EmailPreference } from '../../enum/enum';
 
 export class UpdateWorkspaceNotificationPreferencesDto {
     @IsEnum(EmailPreference)

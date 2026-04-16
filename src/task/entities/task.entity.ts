@@ -4,6 +4,7 @@ import { Attachment } from '../../attachment/entities/attachment.entity';
 import { Board } from '../../board/entities/board.entity';
 import { ColumnEntity } from '../../column/entities/column.entity';
 import { Comment } from '../../comment/entities/comment.entity';
+import { PriorityTask } from '../../enum/enum';
 import { Tag } from '../../tag/entities/tag.entity';
 import { TaskAssignee } from '../../task-assignee/entities/task-assignee.entity';
 import { TaskWatcher } from '../../task-watcher/entities/task-watcher.entity';
@@ -20,13 +21,6 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-
-export enum PriorityTask {
-    low = 'low',
-    medium = 'medium',
-    high = 'high',
-    urgent = 'urgent',
-}
 
 @Entity()
 export class Task {

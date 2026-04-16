@@ -1,3 +1,4 @@
+import { ActivityTypes } from '../../enum/enum';
 import { Task } from '../../task/entities/task.entity';
 import { User } from '../../user/entities/user.entity';
 import {
@@ -7,15 +8,6 @@ import {
     ManyToOne,
     PrimaryGeneratedColumn,
 } from 'typeorm';
-
-export enum ActivityTypes {
-    created = 'created',
-    updated = 'updated',
-    assigned = 'assigned',
-    moved = 'moved',
-    commented = 'commented',
-    attachmentAdded = 'attachmentAdded',
-}
 
 @Entity()
 export class Activity {
