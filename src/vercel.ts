@@ -4,8 +4,8 @@ import { ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import {
-  ExpressAdapter,
-  NestExpressApplication,
+    ExpressAdapter,
+    NestExpressApplication,
 } from '@nestjs/platform-express';
 import express, { Request, Response } from 'express';
 import { join } from 'path';
@@ -15,66 +15,72 @@ const server = express();
 let appReady: Promise<void> | null = null;
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create<NestExpressApplication>(
-    AppModule,
-    new ExpressAdapter(server),
-    {
-      logger: ['error', 'warn', 'log'],
-    },
-  );
-  app.setBaseViewsDir(join(__dirname, 'templates'));
-  app.useStaticAssets(join(__dirname, 'public'));
-  console.log(__dirname);
-  app.useGlobalPipes(
-    new ValidationPipe({
-      forbidNonWhitelisted: true,
-      whitelist: true,
-      transform: true,
-    }),
-  );
-  app.useGlobalPipes(
-    new ValidationPipe({
-      forbidNonWhitelisted: true,
-      whitelist: true,
-      transform: true,
-    }),
-  );
+    const app = await NestFactory.create<NestExpressApplication>(
+        AppModule,
+        new ExpressAdapter(server),
+        {
+            logger: ['error', 'warn', 'log'],
+        },
+    );
+    app.setBaseViewsDir(join(__dirname, 'templates'));
+    app.useStaticAssets(join(__dirname, 'public'));
+    console.log(__dirname);
+    app.useGlobalPipes(
+        new ValidationPipe({
+            forbidNonWhitelisted: true,
+            whitelist: true,
+            transform: true,
+        }),
+    );
+    app.useGlobalPipes(
+        new ValidationPipe({
+            forbidNonWhitelisted: true,
+            whitelist: true,
+            transform: true,
+        }),
+    );
 
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+    app.useGlobalInterceptors(
+        new ClassSerializerInterceptor(app.get(Reflector)),
+    );
 
-  app.setGlobalPrefix('/api/v1/');
+    app.setGlobalPrefix('/api/v1/');
 
-  app.enableCors({
-    origin: ['*', process.env.FRONTEND_URL as string, 'http://localhost:5173'],
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
-    credentials: true,
-  });
+    app.enableCors({
+        origin: [
+            '*',
+            process.env.FRONTEND_URL as string,
+            'http://localhost:5173',
+        ],
+        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
+        credentials: true,
+    });
 
-  const config = new DocumentBuilder()
-    .setTitle('TaskFlow API')
-    .setDescription('The Task Management System API documentation')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .build();
+    const config = new DocumentBuilder()
+        .setTitle('TaskFlow API')
+        .setDescription('The Task Management System API documentation')
+        .setVersion('1.0')
+        .addBearerAuth()
+        .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  const swaggerOptions = {
-    customCssUrl:
-      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css',
-    customJs: [
-      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.js',
-      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-standalone-preset.js',
-    ],
-  };
-  SwaggerModule.setup('api/docs', app, document, swaggerOptions);
+    const document = SwaggerModule.createDocument(app, config);
+    const swaggerOptions = {
+        customCssUrl:
+            'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css',
+        customJs: [
+            'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-standalone-preset.js',
+        ],
+    };
+    SwaggerModule.setup('api/docs', app, document, swaggerOptions);
 
-  await app.init();
+    await app.init();
 }
 
 export default async function handler(req: Request, res: Response) {
-  if (!appReady) {
-    appReady = bootstrap();
-  }
-  await appReady;
-  server(req, res);
+    if (!appReady) {
+        appReady = bootstrap();
+    }
+    await appReady;
+    server(req, res);
 }

@@ -1,29 +1,29 @@
 import {
-  BadRequestException,
-  ForbiddenException,
-  forwardRef,
-  Inject,
-  Injectable,
-  NotFoundException,
+    BadRequestException,
+    ForbiddenException,
+    forwardRef,
+    Inject,
+    Injectable,
+    NotFoundException,
 } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PriorityTask, Task } from './entities/task.entity';
 import {
-  Between,
-  DeepPartial,
-  FindOptionsOrder,
-  FindOptionsWhere,
-  ILike,
-  In,
-  IsNull,
-  LessThan,
-  LessThanOrEqual,
-  Like,
-  MoreThanOrEqual,
-  Not,
-  Repository,
+    Between,
+    DeepPartial,
+    FindOptionsOrder,
+    FindOptionsWhere,
+    ILike,
+    In,
+    IsNull,
+    LessThan,
+    LessThanOrEqual,
+    Like,
+    MoreThanOrEqual,
+    Not,
+    Repository,
 } from 'typeorm';
 import { TaskAssignee } from '../task-assignee/entities/task-assignee.entity';
 import { ColumnEntity } from '../column/entities/column.entity';
@@ -43,661 +43,690 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ActivityService } from '../activity/activity.service';
 import { ActivityTypes } from '../activity/entities/activity.entity';
 export interface FILTER {
-  columnId: string | undefined;
-  assigneeId: string | undefined;
-  priority: PriorityTask | undefined;
-  tagId: string | undefined;
-  dueDateFrom: Date | undefined;
-  dueDateTo: Date | undefined;
+    columnId: string | undefined;
+    assigneeId: string | undefined;
+    priority: PriorityTask | undefined;
+    tagId: string | undefined;
+    dueDateFrom: Date | undefined;
+    dueDateTo: Date | undefined;
 }
 @Injectable()
 export class TaskService {
-  constructor(
-    @InjectRepository(Task) private readonly taskRepo: Repository<Task>,
-    @InjectRepository(TaskAssignee)
-    private readonly taskAssigneeRepo: Repository<TaskAssignee>,
-    @InjectRepository(ColumnEntity)
-    private readonly columnRepo: Repository<ColumnEntity>,
-    @InjectRepository(Tag) private readonly tagRepo: Repository<Tag>,
-    @Inject(forwardRef(() => BoardService))
-    private readonly boardService: BoardService,
-    @InjectRepository(TaskWatcher)
-    private readonly taskWatcherRepo: Repository<TaskWatcher>,
-    @InjectRepository(BoardMember)
-    private readonly boardMemberRepo: Repository<BoardMember>,
-    @InjectRepository(WorkspaceMember)
-    private readonly workspaceMemberRepo: Repository<WorkspaceMember>,
-    // private readonly mailService:MailService,
-    @InjectRepository(User) private readonly userRepo: Repository<User>,
-    private readonly eventEmitter: EventEmitter2,
-    private readonly activityService: ActivityService,
-  ) {}
+    constructor(
+        @InjectRepository(Task) private readonly taskRepo: Repository<Task>,
+        @InjectRepository(TaskAssignee)
+        private readonly taskAssigneeRepo: Repository<TaskAssignee>,
+        @InjectRepository(ColumnEntity)
+        private readonly columnRepo: Repository<ColumnEntity>,
+        @InjectRepository(Tag) private readonly tagRepo: Repository<Tag>,
+        @Inject(forwardRef(() => BoardService))
+        private readonly boardService: BoardService,
+        @InjectRepository(TaskWatcher)
+        private readonly taskWatcherRepo: Repository<TaskWatcher>,
+        @InjectRepository(BoardMember)
+        private readonly boardMemberRepo: Repository<BoardMember>,
+        @InjectRepository(WorkspaceMember)
+        private readonly workspaceMemberRepo: Repository<WorkspaceMember>,
+        // private readonly mailService:MailService,
+        @InjectRepository(User) private readonly userRepo: Repository<User>,
+        private readonly eventEmitter: EventEmitter2,
+        private readonly activityService: ActivityService,
+    ) {}
 
-  async create(userId: string, boardId: string, createTaskDto: CreateTaskDto) {
-    //map the assigneeIds so we can assign the tasks for those people
-    const { assigneeIds, tagIds, columnId, ...taskData } = createTaskDto;
-    const assignees = assigneeIds?.map((id) => ({ user: { id } })) ?? [];
+    async create(
+        userId: string,
+        boardId: string,
+        createTaskDto: CreateTaskDto,
+    ) {
+        //map the assigneeIds so we can assign the tasks for those people
+        const { assigneeIds, tagIds, columnId, ...taskData } = createTaskDto;
+        const assignees = assigneeIds?.map((id) => ({ user: { id } })) ?? [];
 
-    const tags = tagIds?.map((id) => ({ id })) ?? [];
+        const tags = tagIds?.map((id) => ({ id })) ?? [];
 
-    const board = await this.boardService.findOneBoard(boardId);
-    const taskCount = await this.taskRepo.count({
-      where: { board: { workspace: { id: board.workspace.id } } },
-      relations: ['board', 'board.workspace'],
-      withDeleted: true,
-    });
+        const board = await this.boardService.findOneBoard(boardId);
+        const taskCount = await this.taskRepo.count({
+            where: { board: { workspace: { id: board.workspace.id } } },
+            relations: ['board', 'board.workspace'],
+            withDeleted: true,
+        });
 
-    let resolvedColumnId = columnId;
-    if (!resolvedColumnId) {
-      const firstColumn = await this.columnRepo
-        .createQueryBuilder('column')
-        .where('"boardId" = :boardId', { boardId })
-        .orderBy('position', 'ASC')
-        .getOne();
-      if (!firstColumn) throw new BadRequestException('Board has no columns');
-      resolvedColumnId = firstColumn.id;
+        let resolvedColumnId = columnId;
+        if (!resolvedColumnId) {
+            const firstColumn = await this.columnRepo
+                .createQueryBuilder('column')
+                .where('"boardId" = :boardId', { boardId })
+                .orderBy('position', 'ASC')
+                .getOne();
+            if (!firstColumn)
+                throw new BadRequestException('Board has no columns');
+            resolvedColumnId = firstColumn.id;
+        }
+
+        //check if tags exists
+        if (createTaskDto.tagIds?.length) {
+            const existingTags = await this.tagRepo.findBy({
+                id: In(createTaskDto.tagIds),
+            });
+            if (existingTags.length !== createTaskDto.tagIds.length) {
+                throw new BadRequestException('One or more tags not found');
+            }
+        }
+
+        //calculate position
+        const taskPosition = await this.taskRepo.count({
+            where: { column: { id: resolvedColumnId } },
+        });
+
+        const task = this.taskRepo.create({
+            ...taskData,
+            column: { id: resolvedColumnId },
+            board: { id: boardId },
+            assignedTasks: assignees,
+            createdBy: { id: userId },
+            taskNumber: `Task-${taskCount + 1}`,
+            position: taskPosition,
+            tags: tags,
+            watchers: [
+                {
+                    user: { id: userId },
+                },
+            ],
+        });
+        const createdTask = await this.taskRepo.save(task);
+
+        // create activity where task has been created
+        await this.activityService.create({
+            activityType: ActivityTypes.created,
+            fieldName: 'task',
+            oldValue: null,
+            newValue: { title: task.title, priority: task.priority },
+            taskId: task.id,
+            actorId: userId,
+        });
+
+        return createdTask;
     }
 
-    //check if tags exists
-    if (createTaskDto.tagIds?.length) {
-      const existingTags = await this.tagRepo.findBy({
-        id: In(createTaskDto.tagIds),
-      });
-      if (existingTags.length !== createTaskDto.tagIds.length) {
-        throw new BadRequestException('One or more tags not found');
-      }
+    async getCountOfTasksForSpecificColumn(boardId: string, columnId: string) {
+        const count = await this.taskRepo.count({
+            where: {
+                board: { id: boardId },
+                column: { id: columnId },
+            },
+        });
+        return count;
     }
 
-    //calculate position
-    const taskPosition = await this.taskRepo.count({
-      where: { column: { id: resolvedColumnId } },
-    });
+    async findAll(
+        userId: string,
+        boardId: string,
+        filterDto: FindTasksQueryDto,
+    ) {
+        const {
+            limit,
+            page,
+            columnId,
+            assigneeId,
+            priority,
+            tagId,
+            dueDateFrom,
+            dueDateTo,
+            search,
+            sortBy,
+            sortOrder,
+        } = filterDto;
+        //check if user is in board
+        const user = await this.boardService.findOneBoardMember(
+            userId,
+            boardId,
+        );
 
-    const task = this.taskRepo.create({
-      ...taskData,
-      column: { id: resolvedColumnId },
-      board: { id: boardId },
-      assignedTasks: assignees,
-      createdBy: { id: userId },
-      taskNumber: `Task-${taskCount + 1}`,
-      position: taskPosition,
-      tags: tags,
-      watchers: [
-        {
-          user: { id: userId },
-        },
-      ],
-    });
-    const createdTask = await this.taskRepo.save(task);
+        const where: FindOptionsWhere<Task> = { board: { id: boardId } };
 
-    // create activity where task has been created
-    await this.activityService.create({
-      activityType: ActivityTypes.created,
-      fieldName: 'task',
-      oldValue: null,
-      newValue: { title: task.title, priority: task.priority },
-      taskId: task.id,
-      actorId: userId,
-    });
+        if (columnId) where.column = { id: columnId };
+        if (assigneeId) where.assignedTasks = { id: assigneeId };
+        if (priority) where.priority = priority;
+        if (tagId) where.tags = { id: tagId };
+        if (dueDateFrom && dueDateTo) {
+            where.dueDate = Between(dueDateFrom, dueDateTo);
+        } else if (dueDateFrom) {
+            where.dueDate = MoreThanOrEqual(dueDateFrom);
+        } else if (dueDateTo) {
+            where.dueDate = LessThanOrEqual(dueDateTo);
+        }
 
-    return createdTask;
-  }
+        if (search) {
+            where.title = ILike(`%${search}%`);
+            where.description = ILike(`%${search}%`);
+        }
 
-  async getCountOfTasksForSpecificColumn(boardId: string, columnId: string) {
-    const count = await this.taskRepo.count({
-      where: {
-        board: { id: boardId },
-        column: { id: columnId },
-      },
-    });
-    return count;
-  }
+        const order: FindOptionsOrder<Task> = {};
+        if (sortBy && sortOrder) {
+            order[sortBy] = sortOrder;
+        }
 
-  async findAll(userId: string, boardId: string, filterDto: FindTasksQueryDto) {
-    const {
-      limit,
-      page,
-      columnId,
-      assigneeId,
-      priority,
-      tagId,
-      dueDateFrom,
-      dueDateTo,
-      search,
-      sortBy,
-      sortOrder,
-    } = filterDto;
-    //check if user is in board
-    const user = await this.boardService.findOneBoardMember(userId, boardId);
+        // get all tasks from the board
+        const [tasks, taskCount] = await this.taskRepo.findAndCount({
+            where,
+            order,
+            take: limit,
+            skip: (page - 1) * limit,
+        });
 
-    const where: FindOptionsWhere<Task> = { board: { id: boardId } };
-
-    if (columnId) where.column = { id: columnId };
-    if (assigneeId) where.assignedTasks = { id: assigneeId };
-    if (priority) where.priority = priority;
-    if (tagId) where.tags = { id: tagId };
-    if (dueDateFrom && dueDateTo) {
-      where.dueDate = Between(dueDateFrom, dueDateTo);
-    } else if (dueDateFrom) {
-      where.dueDate = MoreThanOrEqual(dueDateFrom);
-    } else if (dueDateTo) {
-      where.dueDate = LessThanOrEqual(dueDateTo);
+        return { tasks, taskCount, pageCount: Math.ceil(taskCount / limit) };
     }
 
-    if (search) {
-      where.title = ILike(`%${search}%`);
-      where.description = ILike(`%${search}%`);
+    async findOne(userId: string, taskId: string) {
+        const task = await this.taskRepo.findOne({
+            where: { id: taskId },
+            relations: {
+                board: {
+                    workspace: true,
+                    members: {
+                        user: true,
+                    },
+                },
+                comment: {
+                    author: true,
+                },
+                assignedTasks: {
+                    user: true,
+                },
+                column: true,
+                watchers: true,
+                createdBy: true,
+                attachments: true,
+                activities: true,
+            },
+        });
+        if (!task) throw new NotFoundException('task not found');
+        const boardMember = await this.boardService.findOneBoardMember(
+            userId,
+            task.board.id,
+        );
+        return task;
     }
 
-    const order: FindOptionsOrder<Task> = {};
-    if (sortBy && sortOrder) {
-      order[sortBy] = sortOrder;
-    }
+    async update(userId: string, taskId: string, updateTaskDto: UpdateTaskDto) {
+        //desctruct the datas
+        const { assigneeIds, columnId, tagIds, ...taskData } = updateTaskDto;
 
-    // get all tasks from the board
-    const [tasks, taskCount] = await this.taskRepo.findAndCount({
-      where,
-      order,
-      take: limit,
-      skip: (page - 1) * limit,
-    });
+        // check if user admin or one of the assignees
+        const assignee = await this.taskAssigneeRepo.findOne({
+            where: { user: { id: userId }, task: { id: taskId } },
+        });
+        const task = await this.findOne(userId, taskId);
 
-    return { tasks, taskCount, pageCount: Math.ceil(taskCount / limit) };
-  }
+        const admin = await this.boardService.findOneBoardMember(
+            userId,
+            task.board.id,
+        );
+        if (admin.role !== BoardRoles.ADMIN && !assignee) {
+            throw new ForbiddenException(
+                'Not Allowed Privilages: only admins or assignees are the ones that are allowed to edit the task',
+            );
+        }
 
-  async findOne(userId: string, taskId: string) {
-    const task = await this.taskRepo.findOne({
-      where: { id: taskId },
-      relations: {
-        board: {
-          workspace: true,
-          members: {
-            user: true,
-          },
-        },
-        comment: {
-          author: true,
-        },
-        assignedTasks: {
-          user: true,
-        },
-        column: true,
-        watchers: true,
-        createdBy: true,
-        attachments: true,
-        activities: true,
-      },
-    });
-    if (!task) throw new NotFoundException('task not found');
-    const boardMember = await this.boardService.findOneBoardMember(
-      userId,
-      task.board.id,
-    );
-    return task;
-  }
+        let completedAt: Date | undefined = undefined;
+        // get done column and check if the id
+        if (columnId) {
+            const column = await this.columnRepo.findOne({
+                where: { id: columnId },
+            });
+            if (column && column.name === 'Done') {
+                completedAt = new Date();
+            }
+        }
 
-  async update(userId: string, taskId: string, updateTaskDto: UpdateTaskDto) {
-    //desctruct the datas
-    const { assigneeIds, columnId, tagIds, ...taskData } = updateTaskDto;
+        // update task assignees
+        if (assigneeIds !== undefined) {
+            if (assigneeIds.length > 0) {
+                await this.taskAssigneeRepo.delete({ task: { id: taskId } });
 
-    // check if user admin or one of the assignees
-    const assignee = await this.taskAssigneeRepo.findOne({
-      where: { user: { id: userId }, task: { id: taskId } },
-    });
-    const task = await this.findOne(userId, taskId);
+                const assignees = assigneeIds.map((assigneeId) => ({
+                    task: { id: taskId },
+                    user: { id: assigneeId },
+                }));
 
-    const admin = await this.boardService.findOneBoardMember(
-      userId,
-      task.board.id,
-    );
-    if (admin.role !== BoardRoles.ADMIN && !assignee) {
-      throw new ForbiddenException(
-        'Not Allowed Privilages: only admins or assignees are the ones that are allowed to edit the task',
-      );
-    }
+                const assigneesInserted =
+                    await this.taskAssigneeRepo.insert(assignees);
+            }
+        }
 
-    let completedAt: Date | undefined = undefined;
-    // get done column and check if the id
-    if (columnId) {
-      const column = await this.columnRepo.findOne({ where: { id: columnId } });
-      if (column && column.name === 'Done') {
-        completedAt = new Date();
-      }
-    }
-
-    // update task assignees
-    if (assigneeIds !== undefined) {
-      if (assigneeIds.length > 0) {
-        await this.taskAssigneeRepo.delete({ task: { id: taskId } });
-
-        const assignees = assigneeIds.map((assigneeId) => ({
-          task: { id: taskId },
-          user: { id: assigneeId },
-        }));
-
-        const assigneesInserted = await this.taskAssigneeRepo.insert(assignees);
-      }
-    }
-
-    //update tags
-    if (tagIds !== undefined) {
-      if (tagIds.length > 0) {
-        const result = await this.tagRepo.query(
-          `
+        //update tags
+        if (tagIds !== undefined) {
+            if (tagIds.length > 0) {
+                const result = await this.tagRepo.query(
+                    `
           delete from "task_tags"
           where "taskId" = $1
           `,
-          [taskId],
+                    [taskId],
+                );
+
+                const tags = tagIds.map((id) => ({
+                    taskId: {
+                        id: taskId,
+                    },
+                    tagId: {
+                        id,
+                    },
+                }));
+
+                await this.taskRepo.manager
+                    .createQueryBuilder()
+                    .insert()
+                    .into('task_tags', ['taskId', 'tagId'])
+                    .values(tags)
+                    .execute();
+            }
+        }
+        await this.taskRepo.update(
+            {
+                id: taskId,
+            },
+            {
+                ...taskData,
+                completedAt,
+                column: columnId ? { id: columnId } : { id: task.column.id },
+            },
         );
 
-        const tags = tagIds.map((id) => ({
-          taskId: {
-            id: taskId,
-          },
-          tagId: {
-            id,
-          },
+        await this.activityService.create({
+            activityType: ActivityTypes.updated,
+            fieldName: 'priority',
+            oldValue: task.priority, // القيمة القديمة قبل الـ update
+            newValue: updateTaskDto.priority, // القيمة الجديدة
+            taskId: taskId,
+            actorId: userId,
+        });
+
+        return this.findOne(userId, taskId);
+    }
+
+    async remove(userId: string, taskId: string) {
+        // check if the userId is the task creator or admin+
+        const task = await this.findOne(userId, taskId);
+        const boardMember = await this.boardService.findOneBoardMember(
+            userId,
+            task.board.id,
+        );
+        if (
+            task.createdBy.id !== userId &&
+            boardMember.role !== BoardRoles.ADMIN
+        ) {
+            throw new ForbiddenException(
+                'Not Allowed Privilages: only admins or creator or the task is the one that is allowed to delete the task',
+            );
+        }
+        const result = await this.taskRepo.softDelete({ id: taskId });
+
+        // 🔔  Notify Assignees and Watchers
+        // TODO: Call your notification service or emit an event here
+        // Example: this.eventEmitter.emit('task.deleted', { task, deletedBy: userId });
+        return { message: 'task has been deleted successfully' };
+    }
+
+    //assign tasks to users
+    async assignTask(
+        userId: string,
+        taskId: string,
+        assignUsersToTaskDto: AssignUsersToTaskDto,
+    ) {
+        //check user in board
+        const task = await this.taskRepo.findOne({
+            where: { id: taskId },
+            relations: ['board', 'createdBy'],
+        });
+        if (!task) throw new NotFoundException('task not found');
+
+        const boardMember = await this.boardService.findOneBoardMember(
+            userId,
+            task.board.id,
+        );
+        console.log(assignUsersToTaskDto.assigneeIds);
+        const values = assignUsersToTaskDto.assigneeIds?.map((id) => ({
+            assignedBy: userId,
+            task: { id: taskId },
+            user: { id },
         }));
 
-        await this.taskRepo.manager
-          .createQueryBuilder()
-          .insert()
-          .into('task_tags', ['taskId', 'tagId'])
-          .values(tags)
-          .execute();
-      }
-    }
-    await this.taskRepo.update(
-      {
-        id: taskId,
-      },
-      {
-        ...taskData,
-        completedAt,
-        column: columnId ? { id: columnId } : { id: task.column.id },
-      },
-    );
+        if (boardMember.role === BoardRoles.VIEWER) {
+            throw new ForbiddenException(
+                'Not Allowed Privilages: Member+ are the ones allowed to assign people tasks',
+            );
+        }
 
-    await this.activityService.create({
-      activityType: ActivityTypes.updated,
-      fieldName: 'priority',
-      oldValue: task.priority, // القيمة القديمة قبل الـ update
-      newValue: updateTaskDto.priority, // القيمة الجديدة
-      taskId: taskId,
-      actorId: userId,
-    });
-
-    return this.findOne(userId, taskId);
-  }
-
-  async remove(userId: string, taskId: string) {
-    // check if the userId is the task creator or admin+
-    const task = await this.findOne(userId, taskId);
-    const boardMember = await this.boardService.findOneBoardMember(
-      userId,
-      task.board.id,
-    );
-    if (task.createdBy.id !== userId && boardMember.role !== BoardRoles.ADMIN) {
-      throw new ForbiddenException(
-        'Not Allowed Privilages: only admins or creator or the task is the one that is allowed to delete the task',
-      );
-    }
-    const result = await this.taskRepo.softDelete({ id: taskId });
-
-    // 🔔  Notify Assignees and Watchers
-    // TODO: Call your notification service or emit an event here
-    // Example: this.eventEmitter.emit('task.deleted', { task, deletedBy: userId });
-    return { message: 'task has been deleted successfully' };
-  }
-
-  //assign tasks to users
-  async assignTask(
-    userId: string,
-    taskId: string,
-    assignUsersToTaskDto: AssignUsersToTaskDto,
-  ) {
-    //check user in board
-    const task = await this.taskRepo.findOne({
-      where: { id: taskId },
-      relations: ['board', 'createdBy'],
-    });
-    if (!task) throw new NotFoundException('task not found');
-
-    const boardMember = await this.boardService.findOneBoardMember(
-      userId,
-      task.board.id,
-    );
-    console.log(assignUsersToTaskDto.assigneeIds);
-    const values = assignUsersToTaskDto.assigneeIds?.map((id) => ({
-      assignedBy: userId,
-      task: { id: taskId },
-      user: { id },
-    }));
-
-    if (boardMember.role === BoardRoles.VIEWER) {
-      throw new ForbiddenException(
-        'Not Allowed Privilages: Member+ are the ones allowed to assign people tasks',
-      );
-    }
-
-    //check if assigneeIds exists in board
-    const boardMembers = await this.boardMemberRepo.find({
-      where: {
-        board: { id: task.board.id },
-        user: In(assignUsersToTaskDto.assigneeIds),
-      },
-    });
-
-    if (
-      boardMembers.length !== new Set(assignUsersToTaskDto.assigneeIds).size
-    ) {
-      throw new BadRequestException(
-        'One or more users do not belong to this workspace',
-      );
-    }
-
-    // if user exists
-
-    const insertedResult = await this.taskAssigneeRepo
-      .createQueryBuilder('task_assignee')
-      .insert()
-      .into('task_assignee')
-      .values([...values])
-      .orIgnore()
-      .returning('*')
-      .execute();
-
-    // map assignees to watchers
-    const watcherList = assignUsersToTaskDto.assigneeIds?.map<
-      DeepPartial<TaskWatcher>
-    >((assigneeId) => {
-      return {
-        task: { id: taskId },
-        user: { id: assigneeId },
-      };
-    });
-
-    // add creator of task to the watchers if it doesn't exists
-    watcherList.push({ task: { id: taskId }, user: { id: task.createdBy.id } });
-
-    // add watchers
-    const watchers = this.taskWatcherRepo
-      .createQueryBuilder('task_watcher')
-      .insert()
-      .into('task_watcher')
-      .values(watcherList)
-      .orIgnore()
-      .execute();
-
-    // email notification
-    const userIds = insertedResult.raw?.map((row) => row.userId);
-    let users: User[];
-    if (userIds.length > 0) {
-      // get emails
-      users = await this.userRepo.find({
-        where: {
-          id: In(userIds),
-        },
-      });
-
-      for (const user of users) {
-        // send notifications
-        this.eventEmitter.emit('notification.task_assigned', {
-          userId: user.id,
-          email: user.email,
-          emailPreference: user.emailPreference,
-          taskTitle: task.title,
-          taskId: task.id,
+        //check if assigneeIds exists in board
+        const boardMembers = await this.boardMemberRepo.find({
+            where: {
+                board: { id: task.board.id },
+                user: In(assignUsersToTaskDto.assigneeIds),
+            },
         });
-      }
+
+        if (
+            boardMembers.length !==
+            new Set(assignUsersToTaskDto.assigneeIds).size
+        ) {
+            throw new BadRequestException(
+                'One or more users do not belong to this workspace',
+            );
+        }
+
+        // if user exists
+
+        const insertedResult = await this.taskAssigneeRepo
+            .createQueryBuilder('task_assignee')
+            .insert()
+            .into('task_assignee')
+            .values([...values])
+            .orIgnore()
+            .returning('*')
+            .execute();
+
+        // map assignees to watchers
+        const watcherList = assignUsersToTaskDto.assigneeIds?.map<
+            DeepPartial<TaskWatcher>
+        >((assigneeId) => {
+            return {
+                task: { id: taskId },
+                user: { id: assigneeId },
+            };
+        });
+
+        // add creator of task to the watchers if it doesn't exists
+        watcherList.push({
+            task: { id: taskId },
+            user: { id: task.createdBy.id },
+        });
+
+        // add watchers
+        const watchers = this.taskWatcherRepo
+            .createQueryBuilder('task_watcher')
+            .insert()
+            .into('task_watcher')
+            .values(watcherList)
+            .orIgnore()
+            .execute();
+
+        // email notification
+        const userIds = insertedResult.raw?.map((row) => row.userId);
+        let users: User[];
+        if (userIds.length > 0) {
+            // get emails
+            users = await this.userRepo.find({
+                where: {
+                    id: In(userIds),
+                },
+            });
+
+            for (const user of users) {
+                // send notifications
+                this.eventEmitter.emit('notification.task_assigned', {
+                    userId: user.id,
+                    email: user.email,
+                    emailPreference: user.emailPreference,
+                    taskTitle: task.title,
+                    taskId: task.id,
+                });
+            }
+        }
+
+        const finalAssignees = await this.taskAssigneeRepo.find({
+            where: { task: { id: taskId } },
+            relations: ['user'],
+        });
+
+        await this.activityService.create({
+            activityType: ActivityTypes.assigned,
+            fieldName: 'assignees',
+            oldValue: null,
+            newValue: { assignedUserIds: assignUsersToTaskDto.assigneeIds },
+            taskId: taskId,
+            actorId: userId,
+        });
+        return {
+            id: task.id,
+            title: task.title,
+            assignees: finalAssignees.map((a) => a.user),
+        };
     }
 
-    const finalAssignees = await this.taskAssigneeRepo.find({
-      where: { task: { id: taskId } },
-      relations: ['user'],
-    });
+    async unassignTask(
+        requestingUserId: string,
+        taskId: string,
+        userToUnassignId: string,
+    ) {
+        // Check if task exists and load relations (board)
+        const task = await this.taskRepo.findOne({
+            where: { id: taskId },
+            relations: ['board', 'assignedTasks', 'assignedTasks.user'],
+        });
+        if (!task) throw new NotFoundException('task not found');
 
-    await this.activityService.create({
-      activityType: ActivityTypes.assigned,
-      fieldName: 'assignees',
-      oldValue: null,
-      newValue: { assignedUserIds: assignUsersToTaskDto.assigneeIds },
-      taskId: taskId,
-      actorId: userId,
-    });
-    return {
-      id: task.id,
-      title: task.title,
-      assignees: finalAssignees.map((a) => a.user),
-    };
-  }
+        // Authorize user role to be Member+
+        const boardMember = await this.boardService.findOneBoardMember(
+            requestingUserId,
+            task.board.id,
+        );
+        if (boardMember.role === BoardRoles.VIEWER) {
+            throw new ForbiddenException(
+                'Not Allowed Privilages: Member+ are the ones allowed to unassign people tasks',
+            );
+        }
 
-  async unassignTask(
-    requestingUserId: string,
-    taskId: string,
-    userToUnassignId: string,
-  ) {
-    // Check if task exists and load relations (board)
-    const task = await this.taskRepo.findOne({
-      where: { id: taskId },
-      relations: ['board', 'assignedTasks', 'assignedTasks.user'],
-    });
-    if (!task) throw new NotFoundException('task not found');
+        // Check if userToUnassign exists in the task assignee
+        const taskAssignee = await this.taskAssigneeRepo.findOne({
+            where: {
+                task: { id: taskId },
+                user: { id: userToUnassignId },
+            },
+            relations: ['user'],
+        });
+        if (!taskAssignee) {
+            throw new NotFoundException('user is not assigned to this task');
+        }
+        // Delete user from taskAssignee table
+        const deleteResult = await this.taskAssigneeRepo.delete({
+            task: { id: taskId },
+            user: { id: userToUnassignId },
+        });
 
-    // Authorize user role to be Member+
-    const boardMember = await this.boardService.findOneBoardMember(
-      requestingUserId,
-      task.board.id,
-    );
-    if (boardMember.role === BoardRoles.VIEWER) {
-      throw new ForbiddenException(
-        'Not Allowed Privilages: Member+ are the ones allowed to unassign people tasks',
-      );
+        // Notify the user
+        this.eventEmitter.emit('notification.task_unassigned', {
+            userId: userToUnassignId,
+            taskId,
+            taskTitle: task.title,
+            emailPreference: taskAssignee.user.emailPreference,
+            email: taskAssignee.user.email,
+        });
+        //fetch other
+        //Notify other users
+        for (const assignee of task.assignedTasks) {
+            this.eventEmitter.emit('notification.task_unassigned', {
+                userId: assignee.user.id,
+                taskId,
+                taskTitle: task.title,
+                emailPreference: taskAssignee.user.emailPreference,
+                email: taskAssignee.user.email,
+                username:
+                    assignee.user.firstname + ' ' + assignee.user.lastname,
+            });
+        }
+        // Return success response
+        return { message: 'unassigned user to the task successfully' };
     }
 
-    // Check if userToUnassign exists in the task assignee
-    const taskAssignee = await this.taskAssigneeRepo.findOne({
-      where: {
-        task: { id: taskId },
-        user: { id: userToUnassignId },
-      },
-      relations: ['user'],
-    });
-    if (!taskAssignee) {
-      throw new NotFoundException('user is not assigned to this task');
+    async moveTask(
+        requestingUserId: string,
+        taskId: string,
+        moveTaskDto: MoveTaskDto,
+    ) {
+        const task = await this.taskRepo.findOne({
+            where: { id: taskId },
+            relations: ['column', 'board', 'board.workspace'],
+        });
+        if (!task) throw new NotFoundException('task not found');
+
+        // check requesting user to be one of the assignees or admin+
+        // 1. try to find the requestingUserId in TaskAssignee Table
+        // 2. not found? then check the workspace Member table if he is the admin or not
+        // if yes then allow moving
+        const isAssignee = await this.taskAssigneeRepo.findOne({
+            where: {
+                user: { id: requestingUserId },
+                task: { id: taskId },
+            },
+        });
+
+        const isAdmin = await this.workspaceMemberRepo.findOne({
+            where: {
+                user: {
+                    id: requestingUserId,
+                },
+                workspace: { id: task.board.workspace.id },
+            },
+        });
+
+        if (
+            (!isAdmin ||
+                (isAdmin &&
+                    isAdmin.role !== WorkspaceMemberRoles.admin &&
+                    isAdmin.role !== WorkspaceMemberRoles.owner)) &&
+            !isAssignee
+        )
+            throw new ForbiddenException('Not Allowed Privilages');
+
+        // 3. COLUMN VALIDATION
+        // "Can only move within same board"
+        // We need to fetch the target column to make sure it belongs to task.column.board.id
+        const column = await this.columnRepo.findOne({
+            where: { id: moveTaskDto.columnId },
+            relations: ['board'],
+        });
+        if (!column) throw new NotFoundException('column not found');
+
+        if (column.board.id !== task.board.id) {
+            throw new BadRequestException(
+                'can only move tasks inside same board',
+            );
+        }
+        // 4. THE DRAG AND DROP MATH (Reordering positions)
+        // DIFFERENT COLUMN
+        if (column.id !== task.column.id) {
+            const oldPosition = task.position;
+            const newPosition = moveTaskDto.position;
+            // update oldColumn tasks to move up position - 1
+            await this.taskRepo
+                .createQueryBuilder()
+                .update('task')
+                .set({ position: () => 'position - 1' })
+                .where('columnId = :columnId', { columnId: task.column.id })
+                .andWhere('position > :taskPosition', {
+                    taskPosition: oldPosition,
+                })
+                .execute();
+
+            // update new column tasks for the position (moving the tasks for the new position to the right)
+            await this.taskRepo
+                .createQueryBuilder()
+                .update('task')
+                .set({ position: () => 'position + 1' })
+                .where('columnId = :columnId', {
+                    columnId: moveTaskDto.columnId,
+                })
+                .andWhere('position >= :newPosition', { newPosition })
+                .execute();
+
+            // update task column
+            task.column = column;
+            if (column.name === 'Done') {
+                task.completedAt = new Date();
+            }
+            task.position = newPosition;
+
+            await this.taskRepo.save(task);
+        }
+        //SAME COLUMN
+        else {
+            // if the old position < new position
+            //shift task down (right)
+            //shift between tasks up (left)
+            const oldPosition = task.position;
+            const newPosition = moveTaskDto.position;
+
+            if (oldPosition < newPosition) {
+                await this.taskRepo
+                    .createQueryBuilder('task')
+                    .update('task')
+                    .set({ position: () => 'position - 1' })
+                    .where('columnId = :columnId', { columnId: task.column.id })
+                    .andWhere('position > :oldPosition', { oldPosition })
+                    .andWhere('position <= :newPosition', { newPosition })
+                    .execute();
+            } else if (oldPosition > newPosition) {
+                await this.taskRepo
+                    .createQueryBuilder('task')
+                    .update('task')
+                    .set({ position: () => 'position + 1' })
+                    .where('columnId = :columnId', { columnId: task.column.id })
+                    .andWhere('position >= :newPosition', { newPosition })
+                    .andWhere('position < :oldPosition', { oldPosition })
+                    .execute();
+            }
+
+            task.position = newPosition;
+            await this.taskRepo.save(task);
+        }
+        //TODO
+        // 5. UPDATE TASK
+
+        // 6. LOG ACTIVITY & NOTIFY WATCHERS
+        await this.activityService.create({
+            activityType: ActivityTypes.moved,
+            fieldName: 'task',
+            taskId: task.id,
+            actorId: requestingUserId,
+            oldValue: {
+                task: task.title,
+                oldColumn: task.column.name,
+                oldPosition: task.column.position,
+            },
+            newValue: {
+                task: task.title,
+                newColumn: column.name,
+                newPostition: moveTaskDto.position,
+            },
+        });
+        return { message: 'task moved successfully' };
     }
-    // Delete user from taskAssignee table
-    const deleteResult = await this.taskAssigneeRepo.delete({
-      task: { id: taskId },
-      user: { id: userToUnassignId },
-    });
 
-    // Notify the user
-    this.eventEmitter.emit('notification.task_unassigned', {
-      userId: userToUnassignId,
-      taskId,
-      taskTitle: task.title,
-      emailPreference: taskAssignee.user.emailPreference,
-      email: taskAssignee.user.email,
-    });
-    //fetch other
-    //Notify other users
-    for (const assignee of task.assignedTasks) {
-      this.eventEmitter.emit('notification.task_unassigned', {
-        userId: assignee.user.id,
-        taskId,
-        taskTitle: task.title,
-        emailPreference: taskAssignee.user.emailPreference,
-        email: taskAssignee.user.email,
-        username: assignee.user.firstname + ' ' + assignee.user.lastname,
-      });
+    findAllWithoutConditions() {
+        const tomorrow = new Date().getTime() + 24 * 60 * 60 * 1000;
+        // const dayAfterTomorrow = tomorrow + 24 * 60 * 60 * 1000;
+
+        return this.taskAssigneeRepo.find({
+            where: {
+                task: {
+                    dueDate: Between(new Date(), new Date(tomorrow)),
+                    completedAt: IsNull(),
+                },
+            },
+            relations: ['task', 'user', 'task.board'],
+        });
     }
-    // Return success response
-    return { message: 'unassigned user to the task successfully' };
-  }
 
-  async moveTask(
-    requestingUserId: string,
-    taskId: string,
-    moveTaskDto: MoveTaskDto,
-  ) {
-    const task = await this.taskRepo.findOne({
-      where: { id: taskId },
-      relations: ['column', 'board', 'board.workspace'],
-    });
-    if (!task) throw new NotFoundException('task not found');
-
-    // check requesting user to be one of the assignees or admin+
-    // 1. try to find the requestingUserId in TaskAssignee Table
-    // 2. not found? then check the workspace Member table if he is the admin or not
-    // if yes then allow moving
-    const isAssignee = await this.taskAssigneeRepo.findOne({
-      where: {
-        user: { id: requestingUserId },
-        task: { id: taskId },
-      },
-    });
-
-    const isAdmin = await this.workspaceMemberRepo.findOne({
-      where: {
-        user: {
-          id: requestingUserId,
-        },
-        workspace: { id: task.board.workspace.id },
-      },
-    });
-
-    if (
-      (!isAdmin ||
-        (isAdmin &&
-          isAdmin.role !== WorkspaceMemberRoles.admin &&
-          isAdmin.role !== WorkspaceMemberRoles.owner)) &&
-      !isAssignee
-    )
-      throw new ForbiddenException('Not Allowed Privilages');
-
-    // 3. COLUMN VALIDATION
-    // "Can only move within same board"
-    // We need to fetch the target column to make sure it belongs to task.column.board.id
-    const column = await this.columnRepo.findOne({
-      where: { id: moveTaskDto.columnId },
-      relations: ['board'],
-    });
-    if (!column) throw new NotFoundException('column not found');
-
-    if (column.board.id !== task.board.id) {
-      throw new BadRequestException('can only move tasks inside same board');
+    findOverdueTasks() {
+        return this.taskAssigneeRepo.find({
+            where: {
+                task: {
+                    dueDate: LessThan(new Date()),
+                    completedAt: IsNull(),
+                },
+            },
+            relations: ['task', 'user', 'task.board'],
+        });
     }
-    // 4. THE DRAG AND DROP MATH (Reordering positions)
-    // DIFFERENT COLUMN
-    if (column.id !== task.column.id) {
-      const oldPosition = task.position;
-      const newPosition = moveTaskDto.position;
-      // update oldColumn tasks to move up position - 1
-      await this.taskRepo
-        .createQueryBuilder()
-        .update('task')
-        .set({ position: () => 'position - 1' })
-        .where('columnId = :columnId', { columnId: task.column.id })
-        .andWhere('position > :taskPosition', { taskPosition: oldPosition })
-        .execute();
-
-      // update new column tasks for the position (moving the tasks for the new position to the right)
-      await this.taskRepo
-        .createQueryBuilder()
-        .update('task')
-        .set({ position: () => 'position + 1' })
-        .where('columnId = :columnId', { columnId: moveTaskDto.columnId })
-        .andWhere('position >= :newPosition', { newPosition })
-        .execute();
-
-      // update task column
-      task.column = column;
-      if (column.name === 'Done') {
-        task.completedAt = new Date();
-      }
-      task.position = newPosition;
-
-      await this.taskRepo.save(task);
-    }
-    //SAME COLUMN
-    else {
-      // if the old position < new position
-      //shift task down (right)
-      //shift between tasks up (left)
-      const oldPosition = task.position;
-      const newPosition = moveTaskDto.position;
-
-      if (oldPosition < newPosition) {
-        await this.taskRepo
-          .createQueryBuilder('task')
-          .update('task')
-          .set({ position: () => 'position - 1' })
-          .where('columnId = :columnId', { columnId: task.column.id })
-          .andWhere('position > :oldPosition', { oldPosition })
-          .andWhere('position <= :newPosition', { newPosition })
-          .execute();
-      } else if (oldPosition > newPosition) {
-        await this.taskRepo
-          .createQueryBuilder('task')
-          .update('task')
-          .set({ position: () => 'position + 1' })
-          .where('columnId = :columnId', { columnId: task.column.id })
-          .andWhere('position >= :newPosition', { newPosition })
-          .andWhere('position < :oldPosition', { oldPosition })
-          .execute();
-      }
-
-      task.position = newPosition;
-      await this.taskRepo.save(task);
-    }
-    //TODO
-    // 5. UPDATE TASK
-
-    // 6. LOG ACTIVITY & NOTIFY WATCHERS
-    await this.activityService.create({
-      activityType: ActivityTypes.moved,
-      fieldName: 'task',
-      taskId: task.id,
-      actorId: requestingUserId,
-      oldValue: {
-        task: task.title,
-        oldColumn: task.column.name,
-        oldPosition: task.column.position,
-      },
-      newValue: {
-        task: task.title,
-        newColumn: column.name,
-        newPostition: moveTaskDto.position,
-      },
-    });
-    return { message: 'task moved successfully' };
-  }
-
-  findAllWithoutConditions() {
-    const tomorrow = new Date().getTime() + 24 * 60 * 60 * 1000;
-    // const dayAfterTomorrow = tomorrow + 24 * 60 * 60 * 1000;
-
-    return this.taskAssigneeRepo.find({
-      where: {
-        task: {
-          dueDate: Between(new Date(), new Date(tomorrow)),
-          completedAt: IsNull(),
-        },
-      },
-      relations: ['task', 'user', 'task.board'],
-    });
-  }
-
-  findOverdueTasks() {
-    return this.taskAssigneeRepo.find({
-      where: {
-        task: {
-          dueDate: LessThan(new Date()),
-          completedAt: IsNull(),
-        },
-      },
-      relations: ['task', 'user', 'task.board'],
-    });
-  }
 }

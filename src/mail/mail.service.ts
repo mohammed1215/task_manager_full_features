@@ -2,8 +2,6 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { SentMessageInfo } from 'nodemailer';
-import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity';
 
 @Injectable()
 export class MailService {

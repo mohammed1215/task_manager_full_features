@@ -10,111 +10,111 @@ import { WorkspaceMember } from '../../workspace-member/entities/workspace-membe
 import { Invitation } from '../../workspace/entities/invitation.entity';
 import { Workspace } from '../../workspace/entities/workspace.entity';
 import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
+    Entity,
+    Column,
+    PrimaryGeneratedColumn,
+    CreateDateColumn,
+    UpdateDateColumn,
+    OneToMany,
 } from 'typeorm';
 
 export enum EmailPreference {
-  IMMEDIATE = 'immediate',
-  DAILY_DIGEST = 'daily_digest',
-  DISABLED = 'disabled',
+    IMMEDIATE = 'immediate',
+    DAILY_DIGEST = 'daily_digest',
+    DISABLED = 'disabled',
 }
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
-  @Column({ type: 'varchar', unique: true })
-  email: string;
+    @Column({ type: 'varchar', unique: true })
+    email: string;
 
-  @Column()
-  @Exclude()
-  password: string;
+    @Column()
+    @Exclude()
+    password: string;
 
-  @Column()
-  firstname: string;
+    @Column()
+    firstname: string;
 
-  @Column()
-  lastname: string;
+    @Column()
+    lastname: string;
 
-  @Column({ nullable: true })
-  avatarUrl?: string;
+    @Column({ nullable: true })
+    avatarUrl?: string;
 
-  @Column({ type: 'varchar', nullable: true })
-  bio?: string;
+    @Column({ type: 'varchar', nullable: true })
+    bio?: string;
 
-  @Column({ type: 'boolean', default: false })
-  emailVerified: boolean;
+    @Column({ type: 'boolean', default: false })
+    emailVerified: boolean;
 
-  @Column({
-    type: 'enum',
-    enum: EmailPreference,
-    default: EmailPreference.IMMEDIATE,
-  })
-  emailPreference: EmailPreference;
+    @Column({
+        type: 'enum',
+        enum: EmailPreference,
+        default: EmailPreference.IMMEDIATE,
+    })
+    emailPreference: EmailPreference;
 
-  @Column({ type: 'boolean', default: false })
-  isActive: boolean;
+    @Column({ type: 'boolean', default: false })
+    isActive: boolean;
 
-  @CreateDateColumn()
-  createdAt: Date;
+    @CreateDateColumn()
+    createdAt: Date;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+    @UpdateDateColumn()
+    updatedAt: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
-  lastLoginAt?: Date;
+    @Column({ type: 'timestamp', nullable: true })
+    lastLoginAt?: Date;
 
-  @Column('int', { default: 0 })
-  failedLoginAttempts: number;
+    @Column('int', { default: 0 })
+    failedLoginAttempts: number;
 
-  @Column('timestamp', { nullable: true })
-  lockUntil: Date | null;
+    @Column('timestamp', { nullable: true })
+    lockUntil: Date | null;
 
-  // A user can be a member of many workspaces
-  @OneToMany(() => WorkspaceMember, (workspaceMember) => workspaceMember.user)
-  memberships: WorkspaceMember[];
+    // A user can be a member of many workspaces
+    @OneToMany(() => WorkspaceMember, (workspaceMember) => workspaceMember.user)
+    memberships: WorkspaceMember[];
 
-  // A user can own many workspaces
-  @OneToMany(() => Workspace, (workspace) => workspace.owner)
-  ownedWorkspaces: Workspace[];
+    // A user can own many workspaces
+    @OneToMany(() => Workspace, (workspace) => workspace.owner)
+    ownedWorkspaces: Workspace[];
 
-  //invitationLink
-  @OneToMany(() => Invitation, (invitation) => invitation.sender)
-  sentInvitations: Invitation[];
+    //invitationLink
+    @OneToMany(() => Invitation, (invitation) => invitation.sender)
+    sentInvitations: Invitation[];
 
-  @OneToMany(() => Invitation, (invitation) => invitation.invitedUser)
-  receivedInvitation: Invitation[];
+    @OneToMany(() => Invitation, (invitation) => invitation.invitedUser)
+    receivedInvitation: Invitation[];
 
-  @OneToMany(() => BoardMember, (boardMember) => boardMember.user)
-  boardMembership: BoardMember[];
+    @OneToMany(() => BoardMember, (boardMember) => boardMember.user)
+    boardMembership: BoardMember[];
 
-  @OneToMany(() => BoardMember, (boardMember) => boardMember.invitedBy)
-  sentBoardInvitations: BoardMember[];
+    @OneToMany(() => BoardMember, (boardMember) => boardMember.invitedBy)
+    sentBoardInvitations: BoardMember[];
 
-  @OneToMany(() => Task, (task) => task.createdBy)
-  createdTasks: Task[];
+    @OneToMany(() => Task, (task) => task.createdBy)
+    createdTasks: Task[];
 
-  @OneToMany(() => TaskAssignee, (task) => task.user)
-  assignedTasks: TaskAssignee[];
+    @OneToMany(() => TaskAssignee, (task) => task.user)
+    assignedTasks: TaskAssignee[];
 
-  @OneToMany(() => TaskAssignee, (task) => task.assignedBy)
-  assigningTasks: TaskAssignee[];
+    @OneToMany(() => TaskAssignee, (task) => task.assignedBy)
+    assigningTasks: TaskAssignee[];
 
-  @OneToMany(() => TaskWatcher, (task) => task.user)
-  watchedTasks: TaskWatcher[];
+    @OneToMany(() => TaskWatcher, (task) => task.user)
+    watchedTasks: TaskWatcher[];
 
-  @OneToMany(() => Comment, (comment) => comment.author)
-  comments: Comment[];
+    @OneToMany(() => Comment, (comment) => comment.author)
+    comments: Comment[];
 
-  @OneToMany(() => Activity, (activity) => activity.actor)
-  activities: Activity[];
+    @OneToMany(() => Activity, (activity) => activity.actor)
+    activities: Activity[];
 
-  @OneToMany(() => Attachment, (attachment) => attachment.uploadedBy)
-  attachments: Attachment[];
+    @OneToMany(() => Attachment, (attachment) => attachment.uploadedBy)
+    attachments: Attachment[];
 }

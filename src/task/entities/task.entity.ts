@@ -1,20 +1,31 @@
-import { Activity } from "../../activity/entities/activity.entity";
-import { Attachment } from "../../attachment/entities/attachment.entity";
+import { Activity } from '../../activity/entities/activity.entity';
+import { Attachment } from '../../attachment/entities/attachment.entity';
 // import { Attachment } from "../../attachment/entities/attachment.entity";
-import { Board } from "../../board/entities/board.entity";
-import { ColumnEntity } from "../../column/entities/column.entity";
-import { Comment } from "../../comment/entities/comment.entity";
-import { Tag } from "../../tag/entities/tag.entity";
-import { TaskAssignee } from "../../task-assignee/entities/task-assignee.entity";
-import { TaskWatcher } from "../../task-watcher/entities/task-watcher.entity";
-import { User } from "../../user/entities/user.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Board } from '../../board/entities/board.entity';
+import { ColumnEntity } from '../../column/entities/column.entity';
+import { Comment } from '../../comment/entities/comment.entity';
+import { Tag } from '../../tag/entities/tag.entity';
+import { TaskAssignee } from '../../task-assignee/entities/task-assignee.entity';
+import { TaskWatcher } from '../../task-watcher/entities/task-watcher.entity';
+import { User } from '../../user/entities/user.entity';
+import {
+    Column,
+    CreateDateColumn,
+    DeleteDateColumn,
+    Entity,
+    JoinTable,
+    ManyToMany,
+    ManyToOne,
+    OneToMany,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 
-export enum PriorityTask{
-    low='low',
-    medium='medium',
-    high='high',
-    urgent='urgent',
+export enum PriorityTask {
+    low = 'low',
+    medium = 'medium',
+    high = 'high',
+    urgent = 'urgent',
 }
 
 @Entity()
@@ -23,7 +34,7 @@ export class Task {
     id: string;
 
     @Column({ type: 'varchar' })
-    taskNumber: string; 
+    taskNumber: string;
 
     @Column()
     title: string;
@@ -38,7 +49,7 @@ export class Task {
     dueDate: Date;
 
     @Column({ type: 'decimal', nullable: true })
-    estimatedHours: number; 
+    estimatedHours: number;
 
     @Column({ type: 'int' })
     position: number;
@@ -56,36 +67,39 @@ export class Task {
     deletedAt: Date;
 
     // Relations
-    @ManyToOne(() => Board, (board) => board.tasksOfBoard, { onDelete: 'CASCADE' })
+    @ManyToOne(() => Board, (board) => board.tasksOfBoard, {
+        onDelete: 'CASCADE',
+    })
     board: Board;
 
-    @ManyToOne(() => ColumnEntity, (column) => column.tasksInsideColumn, { onDelete: 'CASCADE' })
+    @ManyToOne(() => ColumnEntity, (column) => column.tasksInsideColumn, {
+        onDelete: 'CASCADE',
+    })
     column: ColumnEntity;
 
     @ManyToOne(() => User, (user) => user.createdTasks, { onDelete: 'CASCADE' })
     createdBy: User;
 
-    @OneToMany(()=>TaskAssignee,(task)=>task.task,{
-        cascade:true
+    @OneToMany(() => TaskAssignee, (task) => task.task, {
+        cascade: true,
     })
-    assignedTasks: TaskAssignee[]
+    assignedTasks: TaskAssignee[];
 
-   @ManyToMany(() => Tag, (tag) => tag.tasks)
+    @ManyToMany(() => Tag, (tag) => tag.tasks)
     @JoinTable({ name: 'task_tags' }) // TypeORM هيعمل الجدول الوسيط تلقائياً
-    tags: Tag[]
+    tags: Tag[];
 
-    @OneToMany(()=>TaskWatcher,(taskwatcher)=>taskwatcher.task,{
-        cascade:true
+    @OneToMany(() => TaskWatcher, (taskwatcher) => taskwatcher.task, {
+        cascade: true,
     })
-    watchers:TaskWatcher[]
+    watchers: TaskWatcher[];
 
-    @OneToMany(()=>Comment,(comment)=>comment.task)
-    comment: Comment[]
+    @OneToMany(() => Comment, (comment) => comment.task)
+    comment: Comment[];
 
-    @OneToMany(()=>Activity,(activity)=>activity.task)
-    activities:Activity[]
+    @OneToMany(() => Activity, (activity) => activity.task)
+    activities: Activity[];
 
-    @OneToMany(()=>Attachment,attachment=>attachment.task)
-    attachments:Attachment[]
-
+    @OneToMany(() => Attachment, (attachment) => attachment.task)
+    attachments: Attachment[];
 }

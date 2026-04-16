@@ -1,28 +1,36 @@
-import { Workspace } from "../../workspace/entities/workspace.entity";
-import { Column, CreateDateColumn, Entity, ManyToMany, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, Unique } from "typeorm"
-import { Task } from "../../task/entities/task.entity";
+import { Workspace } from '../../workspace/entities/workspace.entity';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    ManyToMany,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+    Unique,
+} from 'typeorm';
+import { Task } from '../../task/entities/task.entity';
 
 @Entity()
+@Unique('unique_tag_per_workspace', ['workspace', 'name'])
 export class Tag {
-
     @PrimaryGeneratedColumn('uuid')
-    id:string;
-    
+    id: string;
+
+    @Column('varchar', { length: 30 })
+    name: string;
+
     @Column()
-    name:string;
-    
-    @Column()
-    color:string;
-    
-    @Column()
-    groupName:string;
-    
+    color: string;
+
+    @Column({ type: 'varchar', nullable: true })
+    groupName: string | null;
+
     @CreateDateColumn()
-    createdAt:Date;
+    createdAt: Date;
 
-    @ManyToOne(()=>Workspace,{onDelete:'CASCADE'})
-    workspace:Workspace
+    @ManyToOne(() => Workspace, { onDelete: 'CASCADE' })
+    workspace: Workspace;
 
-    @ManyToMany(()=>Task,(task)=>task.tags)
-    tasks: Task[]
+    @ManyToMany(() => Task, (task) => task.tags, { onDelete: 'CASCADE' })
+    tasks: Task[];
 }
