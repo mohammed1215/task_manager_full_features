@@ -1,42 +1,48 @@
-import { User } from "../../user/entities/user.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { User } from '../../user/entities/user.entity';
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 
 export enum NotificationTypes {
-  TASK_ASSIGNED = 'TASK_ASSIGNED',
-  USER_MENTIONED = 'USER_MENTIONED',
-  TASK_DUE_SOON = 'TASK_DUE_SOON', // 24 hours
-  TASK_OVERDUE = 'TASK_OVERDUE',
-  WORKSPACE_INVITATION = 'WORKSPACE_INVITATION',
-  WATCHED_TASK_COMMENT = 'WATCHED_TASK_COMMENT',
-  TASK_UNASSIGNED= 'TASK_UNASSIGNED'
+    TASK_ASSIGNED = 'TASK_ASSIGNED',
+    USER_MENTIONED = 'USER_MENTIONED',
+    TASK_DUE_SOON = 'TASK_DUE_SOON', // 24 hours
+    TASK_OVERDUE = 'TASK_OVERDUE',
+    WORKSPACE_INVITATION = 'WORKSPACE_INVITATION',
+    WATCHED_TASK_COMMENT = 'WATCHED_TASK_COMMENT',
+    TASK_UNASSIGNED = 'TASK_UNASSIGNED',
 }
 
 @Entity()
 export class Notification {
     @PrimaryGeneratedColumn('uuid')
-    id:string;
+    id: string;
 
-    @ManyToOne(()=>User)
-    user:User;
-    
-    @Column('enum',{enum:NotificationTypes})
-    type:NotificationTypes;
-    
+    @ManyToOne(() => User)
+    user: User;
+
+    @Column('enum', { enum: NotificationTypes })
+    type: NotificationTypes;
+
     @Column()
-    title:string;
-    
+    title: string;
+
     @Column()
-    message:string;
-    
+    message: string;
+
     @Column()
-    linkUrl:string;
-    
-    @Column({type:'boolean',default:false})
-    isRead:boolean;
+    linkUrl: string;
+
+    @Column({ type: 'boolean', default: false })
+    isRead: boolean;
 
     @CreateDateColumn()
-    createdAt:Date;
+    createdAt: Date;
 
-    @Column({type:'timestamp',nullable:true})
-    readAt:Date;
+    @Column({ type: 'timestamp', nullable: true })
+    readAt: Date;
 }

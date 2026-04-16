@@ -18,7 +18,7 @@ export class WorkspaceMember {
         type: 'enum',
         enum: EmailPreference,
         nullable: true,
-        enumName: 'EmailPreferenceEnum',
+        enumName: 'UserEmailPreference_Enum',
     })
     emailPreference: EmailPreference | null;
 

@@ -55,6 +55,7 @@ export class User {
         type: 'enum',
         enum: EmailPreference,
         default: EmailPreference.IMMEDIATE,
+        enumName: 'UserEmailPreference_Enum',
     })
     emailPreference: EmailPreference;
 
