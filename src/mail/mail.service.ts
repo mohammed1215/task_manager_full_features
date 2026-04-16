@@ -49,7 +49,7 @@ export class MailService {
             subject: 'Verify Email',
             template: '../templates/verificationMail',
             context: {
-                backendUrl: this.config.get('BACKEND_URL'),
+                backendUrl: this.config.get('FRONTEND_URL'),
                 verifyToken,
                 userId,
             },
