@@ -350,4 +350,13 @@ export class BoardService {
         }
         return user;
     }
+
+    async userHasAccess(userId: string, boardId: string): Promise<boolean> {
+        const member = await this.boardMemberRepo.findOne({
+            where: { board: { id: boardId }, user: { id: userId } },
+            withDeleted: true,
+        });
+        if (!member) false;
+        return true;
+    }
 }

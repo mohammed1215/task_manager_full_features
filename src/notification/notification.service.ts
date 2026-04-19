@@ -45,7 +45,11 @@ export class NotificationService {
             where: { user: { id: userId }, isRead: false },
         });
 
-        this.gateway.sendToUser(userId, 'unread_count', notificationCount2);
+        this.gateway.sendToUser(
+            userId,
+            'notification.count',
+            notificationCount2,
+        );
         return savedNotification;
     }
 

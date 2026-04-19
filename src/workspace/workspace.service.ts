@@ -516,4 +516,14 @@ export class WorkspaceService {
             await queryRunner.release();
         }
     }
+
+    async userHasAccess(userId: string, workspaceId: string) {
+        const workspace = await this.workspaceRepo.findOne({
+            where: {
+                id: workspaceId,
+            },
+        });
+        if (!workspace) return false;
+        return true;
+    }
 }

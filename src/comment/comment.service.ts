@@ -162,7 +162,7 @@ export class CommentService {
 
         // validation for comment time
         if (
-            comment.createdAt.getTime() + 15 * 60 * 1000 >
+            comment.createdAt.getTime() + 15 * 60 * 1000 <
             new Date().getTime()
         ) {
             throw new BadRequestException(

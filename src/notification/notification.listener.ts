@@ -6,6 +6,8 @@ import { UserService } from '../user/user.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { TaskService } from '../task/task.service';
 import { EmailPreference, NotificationTypes } from '../enum/enum';
+import { CreateNotificationDto } from './dto/create-notification.dto';
+import { NotificationGateway } from './notification.gateway';
 
 @Injectable()
 export class NotificationListener {
@@ -14,6 +16,7 @@ export class NotificationListener {
         private readonly mailService: MailService,
         private readonly userService: UserService,
         private readonly taskService: TaskService,
+        private readonly gateway: NotificationGateway,
     ) {}
 
     @OnEvent('notification.task_assigned')
@@ -81,6 +84,25 @@ export class NotificationListener {
         }
     }
     // @OnEvent('notification.task')
+    @OnEvent('task_created')
+    async handleNotificationTask(
+        data: CreateNotificationDto,
+        payload: {
+            boardId: string;
+        },
+    ) {
+        // const notification = await this.notificationService.create(userId, {
+        //     ...data,
+        // });
+        this.gateway.sendToBoard(payload.boardId, 'task_created', {
+            ...data,
+        });
+        // if (payload.emailPreference === EmailPreference.IMMEDIATE) {
+        //     //TODO: CREATE SEND CREATED TASK EMAIL FOR NOTIFICATION
+        //     // this.mailService.sendCreatedTaskEmail()
+        // }
+    }
+
     @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
     async autoSendNotificationForDueTasks() {
         const taskAssignees = await this.taskService.findAllWithoutConditions();

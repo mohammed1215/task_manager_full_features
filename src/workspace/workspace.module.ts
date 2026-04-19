@@ -11,18 +11,19 @@ import { Activity } from '../activity/entities/activity.entity';
 import { BoardModule } from '../board/board.module';
 
 @Module({
-  controllers: [WorkspaceController],
-  providers: [WorkspaceService],
-  imports: [
-    TypeOrmModule.forFeature([
-      Workspace,
-      WorkspaceMember,
-      Invitation,
-      Activity,
-    ]),
-    UserModule,
-    forwardRef(() => BoardModule),
-    forwardRef(() => AppModule),
-  ],
+    controllers: [WorkspaceController],
+    providers: [WorkspaceService],
+    imports: [
+        TypeOrmModule.forFeature([
+            Workspace,
+            WorkspaceMember,
+            Invitation,
+            Activity,
+        ]),
+        UserModule,
+        forwardRef(() => BoardModule),
+        forwardRef(() => AppModule),
+    ],
+    exports: [WorkspaceService],
 })
 export class WorkspaceModule {}

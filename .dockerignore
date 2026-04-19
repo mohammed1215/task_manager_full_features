@@ -1,31 +1,34 @@
 # Dependency directories
 node_modules
 dist
-.pnpm-debug.log
 dist-single
-# Version control & CI/CD
-.git
-.github
-.gitignore
 
-pnpm-debug.log
-# Editor settings (Exclude these)
-.vscode
-.zed
-.idea
-*.suo
-*.ntvs*
-*.njsproj
+# Logs
+*.log
+.pnpm-debug.log*
 
-# OS files
-.DS_Store
-Thumbs.db
+# Docker files
+Dockerfile
+docker-compose.yaml
+docker-compose.override.yml
+.dockerignore
 
 # Environment variables
 .env
 .env.*
 
+# OS & Editors
+.DS_Store
+.vscode
+.idea
+.zed
+*.swp
 
-fix_imports.py
-fix_src_imports.py
+# Project specific
+upload/
+*.py
+README.md
 
+# Version control
+.git
+.github

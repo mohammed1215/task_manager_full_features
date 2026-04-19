@@ -1,13 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 
 async function bootstrap() {
-    const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
+    const logger = new Logger();
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+        logger,
+    });
     app.setBaseViewsDir(join(__dirname, 'templates'));
     app.useStaticAssets(join(__dirname, 'public'));
     console.log(__dirname);
@@ -37,7 +39,7 @@ async function bootstrap() {
     SwaggerModule.setup('api/docs', app, document); // The URL where the
 
     // Add '0.0.0.0' as the second parameter
-    await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
-    console.log(`Application is running on: ${await app.getUrl()}`);
+    await app.listen(process.env.PORT ?? 3001, '0.0.0.0');
+    logger.debug(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

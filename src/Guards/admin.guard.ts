@@ -4,6 +4,7 @@ import {
     ExecutionContext,
     ForbiddenException,
     Injectable,
+    Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
@@ -13,6 +14,7 @@ import { WorkspaceMemberRoles } from '../enum/enum';
 
 @Injectable()
 export class AdminWorkspaceGuard implements CanActivate {
+    private readonly logger = new Logger(AdminWorkspaceGuard.name);
     constructor(
         @InjectRepository(WorkspaceMember)
         private memberRepo: Repository<WorkspaceMember>,
@@ -24,7 +26,7 @@ export class AdminWorkspaceGuard implements CanActivate {
 
         // I WANT THE WORKSPACE ID HMMMMM HOW TO SEND THE WORKSPACE ID TO HERE?
 
-        console.log('Checking if user is admin in workspace:', workspaceId);
+        this.logger.log('Checking if user is admin in workspace:', workspaceId);
         // check if workspaceId exists or not
         if (!workspaceId) {
             throw new BadRequestException('Workspace ID is required');
@@ -60,7 +62,7 @@ export class AdminWorkspaceGuard implements CanActivate {
         }
 
         // if passed then return true
-        console.log(`User ${userId} is admin in workspace ${workspaceId}`);
+        this.logger.log(`User ${userId} is admin in workspace ${workspaceId}`);
         return true;
     }
 }

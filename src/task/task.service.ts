@@ -40,9 +40,12 @@ import { ActivityService } from '../activity/activity.service';
 import {
     ActivityTypes,
     BoardRoles,
+    NotificationTypes,
     PriorityTask,
     WorkspaceMemberRoles,
 } from '../enum/enum';
+import { CreateNotificationDto } from '../notification/dto/create-notification.dto';
+import { ConfigService } from '@nestjs/config';
 
 export interface FILTER {
     columnId: string | undefined;
@@ -74,6 +77,7 @@ export class TaskService {
         @InjectRepository(User) private readonly userRepo: Repository<User>,
         private readonly eventEmitter: EventEmitter2,
         private readonly activityService: ActivityService,
+        private readonly config: ConfigService,
     ) {}
 
     async create(
@@ -147,6 +151,26 @@ export class TaskService {
             taskId: task.id,
             actorId: userId,
         });
+
+        // get workspace member preference
+        const workspaceMember = await this.workspaceMemberRepo.findOne({
+            where: {
+                workspace: { id: board.workspace.id },
+                user: { id: userId },
+            },
+            relations: ['user'],
+        });
+
+        //send notification for task created
+        const data: CreateNotificationDto = {
+            type: NotificationTypes.TASK_CREATED,
+            title: 'Task created',
+            message: `${task.title} has been created in board: ${board.name} in workspace:${board.workspace.name}`,
+            linkUrl: `${this.config.get('FRONTEND_URL')}/boards/${boardId}`,
+        };
+
+        // send to all users in board
+        await this.eventEmitter.emitAsync('task_created', data, { boardId });
 
         return createdTask;
     }

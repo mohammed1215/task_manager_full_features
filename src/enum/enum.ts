@@ -16,6 +16,7 @@ export enum NotificationTypes {
     WORKSPACE_INVITATION = 'WORKSPACE_INVITATION',
     WATCHED_TASK_COMMENT = 'WATCHED_TASK_COMMENT',
     TASK_UNASSIGNED = 'TASK_UNASSIGNED',
+    TASK_CREATED = 'TASK_CREATED',
 }
 
 export enum EmailPreference {

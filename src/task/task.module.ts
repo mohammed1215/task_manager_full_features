@@ -13,26 +13,28 @@ import { WorkspaceMember } from '../workspace-member/entities/workspace-member.e
 import { AppModule } from '../app.module';
 import { User } from '../user/entities/user.entity';
 import { ActivityModule } from '../activity/activity.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
-  controllers: [TaskController],
-  providers: [TaskService],
-  exports: [TaskService],
-  imports: [
-    TypeOrmModule.forFeature([
-      Task,
-      TaskAssignee,
-      ColumnEntity,
-      Tag,
-      TaskWatcher,
-      BoardMember,
-      WorkspaceMember,
-      User,
-    ]),
-    forwardRef(() => BoardModule),
-    forwardRef(() => AppModule),
-    ActivityModule,
-
-  ],
+    controllers: [TaskController],
+    providers: [TaskService],
+    exports: [TaskService],
+    imports: [
+        TypeOrmModule.forFeature([
+            Task,
+            TaskAssignee,
+            ColumnEntity,
+            Tag,
+            TaskWatcher,
+            BoardMember,
+            WorkspaceMember,
+            User,
+        ]),
+        forwardRef(() => BoardModule),
+        forwardRef(() => AppModule),
+        ActivityModule,
+        NotificationModule,
+        forwardRef(() => AppModule),
+    ],
 })
 export class TaskModule {}

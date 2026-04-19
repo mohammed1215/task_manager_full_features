@@ -1,4 +1,10 @@
-import { ClassSerializerInterceptor, forwardRef, Module } from '@nestjs/common';
+import {
+    ClassSerializerInterceptor,
+    ConsoleLogger,
+    forwardRef,
+    Logger,
+    Module,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
@@ -11,7 +17,7 @@ import { Workspace } from './workspace/entities/workspace.entity';
 import { WorkspaceMember } from './workspace-member/entities/workspace-member.entity';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MailService } from './mail/mail.service';
 import { JwtProviderService } from './jwt-provider/jwt-provider.service';
@@ -46,8 +52,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { SearchModule } from './search/search.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { join } from 'path';
+import path, { join } from 'path';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
     imports: [
@@ -64,7 +71,11 @@ import { AnalyticsModule } from './analytics/analytics.module';
                 return {
                     type: 'postgres',
                     url: config.get<string>('DATABASE_CONNECTION_STRING'),
-                    synchronize: true,
+                    synchronize: false,
+                    migrationsRun: true,
+                    migrations: [
+                        path.join(__dirname, 'database', 'migrations', '*.ts'),
+                    ],
                     entities: [
                         User,
                         Workspace,
@@ -122,42 +133,48 @@ import { AnalyticsModule } from './analytics/analytics.module';
                 };
             },
         }),
-        MulterModule.register({
-            storage: multer.diskStorage({
-                destination(req, file, callback) {
-                    console.log('📂 Target Destination: ./upload');
-                    const uploadPath = './upload';
-                    if (!existsSync(uploadPath)) {
-                        mkdirSync(uploadPath, { recursive: true });
-                    }
-                    callback(null, './upload');
-                },
-                filename(req, file, callback) {
-                    const time = Date.now();
-                    const randomString = Math.floor(Math.random() * 1000000);
-                    const filename = `${randomString}_${time}_${file.originalname}`;
-                    console.log('📄 Generated Filename:', filename); // Check if name is valid
-                    callback(null, filename);
-                },
-            }),
-            fileFilter(req, file, callback) {
-                if (file.mimetype.split('/')[0] !== 'image') {
-                    console.error('❌ Rejected: Not an image');
-                    callback(new Error('not allowed file type'), false);
-                    return;
-                }
-                if (file.size > 5 * 1024 * 1024) {
-                    console.error('❌ Rejected: Max Size 5MB');
-                    callback(new Error('file size max 5MB'), false);
-                    return;
-                }
-                console.log('✅ Accepted: File is an image');
-                callback(null, true);
+        MulterModule.registerAsync({
+            useFactory() {
+                const logger = new Logger(MulterModule.name);
+
+                return {
+                    storage: multer.diskStorage({
+                        destination(req, file, callback) {
+                            logger.log('📂 Target Destination: ./upload');
+                            const uploadPath = './upload';
+                            if (!existsSync(uploadPath)) {
+                                mkdirSync(uploadPath, { recursive: true });
+                            }
+                            callback(null, './upload');
+                        },
+                        filename(req, file, callback) {
+                            const time = Date.now();
+                            const randomString = Math.floor(
+                                Math.random() * 1000000,
+                            );
+                            const filename = `${randomString}_${time}_${file.originalname}`;
+                            logger.log('📄 Generated Filename:', filename); // Check if name is valid
+                            callback(null, filename);
+                        },
+                    }),
+                    limits: {
+                        fileSize: 5 * 1024 * 1024,
+                    },
+                    fileFilter(req, file, callback) {
+                        if (file.mimetype.split('/')[0] !== 'image') {
+                            logger.error('❌ Rejected: Not an image');
+                            callback(new Error('not allowed file type'), false);
+                            return;
+                        }
+                        logger.log('✅ Accepted: File is an image');
+                        callback(null, true);
+                    },
+                };
             },
         }),
         BoardModule,
         ColumnModule,
-        TaskModule,
+        forwardRef(() => TaskModule),
         CommentModule,
         AttachmentModule,
         TagModule,
@@ -171,6 +188,15 @@ import { AnalyticsModule } from './analytics/analytics.module';
         SearchModule,
         CloudinaryModule,
         AnalyticsModule,
+        ThrottlerModule.forRoot({
+            throttlers: [
+                {
+                    ttl: 60 * 1000,
+                    limit: 10,
+                    name: 'high',
+                },
+            ],
+        }),
     ],
     controllers: [AppController],
     providers: [
@@ -181,6 +207,10 @@ import { AnalyticsModule } from './analytics/analytics.module';
         },
         MailService,
         JwtProviderService,
+        {
+            provide: APP_GUARD,
+            useClass: ThrottlerGuard,
+        },
     ],
     exports: [MailService, JwtProviderService],
 })
