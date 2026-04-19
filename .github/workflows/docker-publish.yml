@@ -1,40 +1,40 @@
 name: Build and Push Docker Image
 
 on:
-  workflow_dispatch:
-  push:
-    branches: ['master']
+    workflow_dispatch:
+    push:
+        branches: ['main']
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+    build-and-push:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+            - name: Log in to GitHub Container Registry
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
 
-      # الخطوة دي مهمة جداً: بتحول اسم المستخدم لحروف صغيرة
-      - name: Lowercase repository owner
-        run: |
-          echo "OWNER_LC=${OWNER,,}" >> ${GITHUB_ENV}
-        env:
-          OWNER: ${{ github.repository_owner }}
+            # الخطوة دي مهمة جداً: بتحول اسم المستخدم لحروف صغيرة
+            - name: Lowercase repository owner
+              run: |
+                  echo "OWNER_LC=${OWNER,,}" >> ${GITHUB_ENV}
+              env:
+                  OWNER: ${{ github.repository_owner }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          # هنا بنستخدم الـ OWNER_LC اللي لسه محولينه
-          tags: |
-            ghcr.io/${{ env.OWNER_LC }}/cliniq-backend:latest
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  push: true
+                  # هنا بنستخدم الـ OWNER_LC اللي لسه محولينه
+                  tags: |
+                      ghcr.io/${{ env.OWNER_LC }}/cliniq-backend:latest
