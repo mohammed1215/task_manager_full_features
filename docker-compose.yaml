@@ -8,11 +8,18 @@ services:
             - .env.docker
         depends_on:
             - db
+        command: >
+            sh -c "pnpm migration:run && pnpm run start:prod"
     db:
         image: postgres:15-alpine
         ports:
-            - 5432:5432
+            - 5431:5432
         environment:
-            - POSTGRES_PASSWORD={DB_PASSWORD:-password}
-            - POSTGRES_USER={DB_USER:-user}
-            - POSTGRES_DB={DB_NAME:-task_manager_flow_db}
+            - POSTGRES_PASSWORD=${DB_PASSWORD:-123123}
+            - POSTGRES_USER=${DB_USER:-postgres}
+            - POSTGRES_DB=${DB_NAME:-task_manager_full}
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        command:
+volumes:
+    postgres_data:

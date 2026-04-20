@@ -11,7 +11,6 @@ export class WorkspaceMember {
     @Column({
         type: 'enum',
         enum: WorkspaceMemberRoles,
-        enumName: 'WorkspaceMemberRolesEnum',
     })
     role: WorkspaceMemberRoles;
 
@@ -22,7 +21,6 @@ export class WorkspaceMember {
         type: 'enum',
         enum: EmailPreference,
         nullable: true,
-        enumName: 'UserEmailPreference_Enum',
     })
     emailPreference: EmailPreference | null;
 
