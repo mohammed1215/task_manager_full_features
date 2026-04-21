@@ -112,10 +112,17 @@ export class AnalyticsService {
                 .createQueryBuilder('task_assignee')
                 .select('task_assignee."userId"', 'userId')
                 .addSelect('count(*)::INT', 'count')
+                .addSelect('user.firstname', 'firstname')
+                .addSelect('user.lastname', 'lastname')
+                .addSelect('user.avatarUrl', 'avatarUrl')
                 .innerJoin('task_assignee.task', 'task')
                 .innerJoin('task.board', 'board')
+                .innerJoin('task_assignee.user', 'user')
                 .where('board."workspaceId" = :workspaceId', { workspaceId })
                 .groupBy('task_assignee."userId"')
+                .addGroupBy('user.firstname')
+                .addGroupBy('user.lastname')
+                .addGroupBy('user.avatarUrl')
                 .getRawMany();
 
         const mostActiveBoards: dashboardReponse['mostActiveBoards'] =
