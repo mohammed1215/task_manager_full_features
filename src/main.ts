@@ -26,6 +26,8 @@ async function bootstrap() {
             '*',
             process.env.FRONTEND_URL as string,
             'http://localhost:5173',
+            'http://localhost:4173',
+            'http://localhost:5174',
         ],
     });
     const config = new DocumentBuilder()

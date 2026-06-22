@@ -119,21 +119,21 @@ export class UserService {
         //use userId to find the user and update it with the new data in update profile dto variable
         const result = await this.userRepo.update(
             { id: userId },
-            { ...user, ...updateProfileDto },
+            { ...updateProfileDto },
         );
 
         //if no affected data then user couldn't be found
         if (!result.affected) throw new NotFoundException('user not found');
 
         //activity
-        const activity = this.activityRepo.create({
-            actor: { id: userId },
-            fieldName: 'updated user profile',
-            oldValue: JSON.stringify(user),
-            newValue: result.raw,
-        });
+        // const activity = this.activityRepo.create({
+        //     actor: { id: userId },
+        //     fieldName: 'updated user profile',
+        //     oldValue: JSON.stringify(user),
+        //     newValue: result.raw,
+        // });
 
-        await this.activityRepo.save(activity);
+        // await this.activityRepo.save(activity);
 
         //return updated successfully message
         return 'updated profile data successfully';
