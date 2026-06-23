@@ -151,23 +151,28 @@ export class UserService {
             let user = await this.findOne(userId);
             const oldUrl = user.avatarUrl;
 
-            //delete the file
-            if (oldUrl) {
-                await this.deleteOldImage(oldUrl);
-            }
-
             if (this.cloudinaryService.isCloudinaryEnabled()) {
                 const result = await this.cloudinaryService.upload(file);
+                console.log(result.publicId);
                 newProfileUrl = result.url;
             } else {
                 newProfileUrl = `${this.config.get<string>('BACKEND_URL')}/images/${file?.filename}`;
             }
 
             // save new user avatar Url
-            user = await this.userRepo.save({
-                ...user,
-                avatarUrl: newProfileUrl,
-            });
+            user.avatarUrl = newProfileUrl;
+            user = await this.userRepo.save(user);
+
+            //delete the file
+            if (oldUrl) {
+                const publicId = this.extractPublicId(oldUrl);
+                this.deleteOldImage(publicId).catch((err) => {
+                    console.error(
+                        `Failed to delete old avatar ${oldUrl}:`,
+                        err,
+                    );
+                });
+            }
 
             //return updated successfully message
             return { message: 'updated profile avatar successfully', user };
@@ -229,5 +234,11 @@ export class UserService {
         } catch (error) {
             console.error('Error deleting local file:', error);
         }
+    }
+
+    private extractPublicId(url: string): string {
+        const publicId = url.split('/').slice(-3).join('/').split('.')[0];
+        console.log(publicId);
+        return publicId;
     }
 }
