@@ -1,6 +1,5 @@
 import {
     ClassSerializerInterceptor,
-    ConsoleLogger,
     forwardRef,
     Logger,
     Module,
@@ -23,7 +22,6 @@ import { MailService } from './mail/mail.service';
 import { JwtProviderService } from './jwt-provider/jwt-provider.service';
 import { MulterModule } from '@nestjs/platform-express';
 import multer from 'multer';
-import { existsSync, mkdirSync } from 'fs';
 import { Invitation } from './workspace/entities/invitation.entity';
 import { BoardModule } from './board/board.module';
 import { ColumnModule } from './column/column.module';
@@ -138,25 +136,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
                 const logger = new Logger(MulterModule.name);
 
                 return {
-                    storage: multer.diskStorage({
-                        destination(req, file, callback) {
-                            logger.log('📂 Target Destination: ./upload');
-                            const uploadPath = './upload';
-                            if (!existsSync(uploadPath)) {
-                                mkdirSync(uploadPath, { recursive: true });
-                            }
-                            callback(null, './upload');
-                        },
-                        filename(req, file, callback) {
-                            const time = Date.now();
-                            const randomString = Math.floor(
-                                Math.random() * 1000000,
-                            );
-                            const filename = `${randomString}_${time}_${file.originalname}`;
-                            logger.log('📄 Generated Filename:', filename); // Check if name is valid
-                            callback(null, filename);
-                        },
-                    }),
+                    storage: multer.memoryStorage(),
                     limits: {
                         fileSize: 5 * 1024 * 1024,
                     },

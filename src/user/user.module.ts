@@ -19,23 +19,7 @@ import { WorkspaceMember } from '../workspace-member/entities/workspace-member.e
         TypeOrmModule.forFeature([User, Activity, WorkspaceMember]),
         forwardRef(() => AuthModule),
         MulterModule.register({
-            storage: multer.diskStorage({
-                destination(req, file, callback) {
-                    console.log('📂 Target Destination: ./upload');
-                    const uploadPath = './upload';
-                    if (!existsSync(uploadPath)) {
-                        mkdirSync(uploadPath, { recursive: true });
-                    }
-                    callback(null, './upload');
-                },
-                filename(req, file, callback) {
-                    const time = Date.now();
-                    const randomString = Math.floor(Math.random() * 1000000);
-                    const filename = `${randomString}_${time}_${file.originalname}`;
-                    console.log('📄 Generated Filename:', filename); // Check if name is valid
-                    callback(null, filename);
-                },
-            }),
+            storage: multer.memoryStorage(),
             fileFilter(req, file, callback) {
                 if (file.mimetype.split('/')[0] !== 'image') {
                     console.error('❌ Rejected: Not an image');
