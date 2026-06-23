@@ -67,7 +67,11 @@ export class AttachmentService {
         }
 
         //upload file on cloudinary if production
-        let resultOfUploading;
+        let resultOfUploading: {
+            url: string;
+            publicId: string;
+            filename: string;
+        } | null = null;
         try {
             if (this.cloudinaryService.isCloudinaryEnabled()) {
                 const resourceType = this.getResourceType(attachment.mimetype);
@@ -78,38 +82,38 @@ export class AttachmentService {
                 );
                 // Delete local file after upload (important for Vercel)
                 await this.deleteLocalFile(attachment.path);
-            } else {
-                resultOfUploading = null;
             }
 
             //create attachment
             const attachmentRow = this.attachmentRepo.create({
-                filename: attachment.filename,
+                filename: attachment.originalname,
                 fileSize: attachment.size,
                 originalFilename: attachment.originalname,
                 uploadedBy: { id: userId },
                 task: { id: taskId },
-                storagePath: this.cloudinaryService.isCloudinaryEnabled()
-                    ? resultOfUploading.url
-                    : `/${attachment.path}`,
+                storagePath:
+                    this.cloudinaryService.isCloudinaryEnabled() &&
+                    resultOfUploading
+                        ? resultOfUploading.url
+                        : `/${attachment.path}`,
                 contentType: attachment.mimetype,
             });
 
-            const createdAttachment =
-                await this.attachmentRepo.save(attachmentRow);
+            await this.attachmentRepo.save(attachmentRow);
+
             await this.activityService.create({
                 activityType: ActivityTypes.attachmentAdded,
                 fieldName: 'attachment',
                 oldValue: null,
                 newValue: {
-                    attachmentName: createdAttachment.filename,
-                    size: createdAttachment.fileSize,
+                    attachmentName: attachmentRow.filename,
+                    size: attachmentRow.fileSize,
                 },
 
                 taskId: taskId,
                 actorId: userId,
             });
-            return createdAttachment;
+            return attachmentRow;
         } catch (error) {
             if (existsSync(attachment.path)) {
                 await this.deleteLocalFile(attachment.path);

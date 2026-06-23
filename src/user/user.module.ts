@@ -6,7 +6,6 @@ import { User } from './entities/user.entity';
 import { AuthModule } from '../auth/auth.module';
 import { MulterModule } from '@nestjs/platform-express';
 import multer from 'multer';
-import { existsSync, mkdirSync } from 'fs';
 import { Activity } from '../activity/entities/activity.entity';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity';

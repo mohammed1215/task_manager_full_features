@@ -12,6 +12,7 @@ import { Activity } from '../activity/entities/activity.entity';
 import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity';
 import { CloudinaryModule } from '../cloudinary/cloudinary.module';
 import { ActivityModule } from '../activity/activity.module';
+import path from 'path';
 @Module({
     controllers: [AttachmentController],
     providers: [AttachmentService],
@@ -19,19 +20,20 @@ import { ActivityModule } from '../activity/activity.module';
         MulterModule.register({
             storage: memoryStorage(),
             fileFilter(req, file, callback) {
+                const ext = path.extname(file.originalname);
                 if (
                     ![
-                        'jpg',
-                        'png',
-                        'gif',
-                        'pdf',
-                        'doc',
-                        'docx',
-                        'xls',
-                        'xlsx',
-                        'txt',
-                        'zip',
-                    ].includes(file.mimetype.split('/')[1])
+                        '.jpg',
+                        '.png',
+                        '.gif',
+                        '.pdf',
+                        '.doc',
+                        '.docx',
+                        '.xls',
+                        '.xlsx',
+                        '.txt',
+                        '.zip',
+                    ].includes(ext)
                 ) {
                     console.log(file);
                     callback(
