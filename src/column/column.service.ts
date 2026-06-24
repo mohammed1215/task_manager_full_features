@@ -10,11 +10,11 @@ import { CreateColumnDto } from './dto/create-column.dto';
 import { UpdateColumnDto } from './dto/update-column.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ColumnEntity } from './entities/column.entity';
-import { Between, Not, Repository } from 'typeorm';
+import { Between, FindOptionsOrder, Repository } from 'typeorm';
 import { BoardService } from '../board/board.service';
 import { ReOrderColumnDto } from './dto/reorder-column.dto';
 import { TaskService } from '../task/task.service';
-import { BoardRoles } from '../enum/enum';
+import { BoardRoles, SortBy } from '../enum/enum';
 
 @Injectable()
 export class ColumnService {
@@ -64,22 +64,62 @@ export class ColumnService {
         return this.columnRepo.save(column);
     }
 
-    async findAll(userId: string, boardId: string) {
+    async findAll(userId: string, boardId: string, sortBy?: SortBy) {
         await this.boardService.findOneBoardMember(userId, boardId);
+        let order: FindOptionsOrder<ColumnEntity>;
+        console.log(sortBy);
+        switch (sortBy) {
+            case SortBy.CREATED_AT:
+                order = {
+                    position: 'ASC',
+                    tasksInsideColumn: {
+                        createdAt: 'ASC',
+                    },
+                };
+                break;
+            case SortBy.DUE_DATE:
+                order = {
+                    position: 'ASC',
+                    tasksInsideColumn: {
+                        dueDate: 'ASC',
+                    },
+                };
+                break;
+            case SortBy.PRIORITY:
+                order = {
+                    position: 'ASC',
+                    tasksInsideColumn: {
+                        priority: 'ASC',
+                    },
+                };
+                break;
+            case SortBy.UPDATED_AT:
+                order = {
+                    position: 'ASC',
+                    tasksInsideColumn: {
+                        updatedAt: 'ASC',
+                    },
+                };
+                break;
+            default:
+                order = {
+                    position: 'ASC',
+                    tasksInsideColumn: {
+                        position: 'ASC',
+                    },
+                };
+                break;
+        }
 
         return this.columnRepo.find({
             where: {
                 board: { id: boardId },
             },
-            order: {
-                position: 'ASC',
-                tasksInsideColumn: {
-                    position: 'ASC',
-                },
-            },
+            order,
             relations: [
                 'board',
                 'tasksInsideColumn',
+                'tasksInsideColumn.createdBy',
                 'tasksInsideColumn.assignedTasks',
             ],
         });
