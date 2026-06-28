@@ -28,8 +28,8 @@ export class NotificationListener {
             message: `You have been assigned to: ${payload.taskTitle}`,
             linkUrl: `/tasks/${payload.taskId}`,
         });
-
-        // see user preferences
+        await this.gateway.handleNotificationCount(payload.userId);
+        // see  user preferences
         // const user = await this.userService.findOne(payload.userId)
         if (payload.emailPreference === EmailPreference.IMMEDIATE) {
             this.mailService.sendTaskAssignedEmail(payload.email);
@@ -125,13 +125,24 @@ export class NotificationListener {
     }
 
     @OnEvent('notification.send-invitation')
-    async handleInvitationNotification(payload: any) {
+    async handleInvitationNotification(payload: {
+        emailPreference: EmailPreference;
+        email: string;
+        workspaceName: string;
+        invitationId: string;
+        senderId: string;
+        userId: string;
+        workspaceId: string;
+    }) {
         await this.notificationService.create(payload.userId, {
             type: NotificationTypes.WORKSPACE_INVITATION,
             title: 'Workspace Invitation',
             message: 'you have been invited to workspace',
             linkUrl: `/workspaces/${payload.workspaceId}`,
         });
+
+        if (payload && payload['userId'])
+            await this.gateway.handleNotificationCount(payload.userId);
 
         // email preferences
         if (payload.emailPreference === EmailPreference.IMMEDIATE) {

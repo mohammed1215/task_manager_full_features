@@ -24,8 +24,10 @@ import {
     ApiBearerAuth,
     ApiConsumes,
     ApiBody,
+    OmitType,
 } from '@nestjs/swagger';
 import { UpdateNotificationPreferenceDto } from './dto/update-notification-preference.dto';
+import { User as UserType } from './entities/user.entity';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -62,9 +64,12 @@ export class UserController {
     @ApiResponse({
         status: 200,
         description: 'User profile retrieved successfully',
+        type: class OmittedUser extends OmitType(UserType, [
+            'password',
+        ] as const) {},
     })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
-    findMe(@User() user: jwtPayload) {
+    findMe(@User() user: jwtPayload): Promise<UserType> {
         console.log(user);
         return this.userService.findOne(user.userId);
     }
@@ -82,7 +87,7 @@ export class UserController {
     async updateProfile(
         @User() user: jwtPayload,
         @Body() updateProfileDto: UpdateProfileDto,
-    ) {
+    ): Promise<{ message: string }> {
         return {
             message: await this.userService.updateProfile(
                 user.userId,
@@ -127,17 +132,18 @@ export class UserController {
             }),
         )
         file: Express.Multer.File,
-    ) {
+    ): Promise<{ message: string; user: UserType }> {
         return this.userService.uploadAvatar(user.userId, file);
     }
 
     //notification preferences
     @Get('me/notification-preferences')
     @UseGuards(AuthGuard('jwt'))
+    @ApiResponse({ status: 200, description: 'Success' })
     updateNotificationPreferences(
         @User() user: jwtPayload,
         updateNotificationPreferenceDto: UpdateNotificationPreferenceDto,
-    ) {
+    ): Promise<{ message: string }> {
         return this.userService.updateNotificationPreferences(
             user.userId,
             updateNotificationPreferenceDto,

@@ -3,18 +3,18 @@ import { TaskWatcherController } from './task-watcher.controller';
 import { TaskWatcherService } from './task-watcher.service';
 
 describe('TaskWatcherController', () => {
-  let controller: TaskWatcherController;
+    let controller: TaskWatcherController;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [TaskWatcherController],
-      providers: [TaskWatcherService],
-    }).compile();
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            controllers: [TaskWatcherController],
+            providers: [TaskWatcherService],
+        }).compile();
 
-    controller = module.get<TaskWatcherController>(TaskWatcherController);
-  });
+        controller = module.get<TaskWatcherController>(TaskWatcherController);
+    });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
+    it('should be defined', () => {
+        expect(controller).toBeDefined();
+    });
 });

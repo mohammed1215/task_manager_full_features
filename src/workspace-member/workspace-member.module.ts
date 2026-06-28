@@ -5,9 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { WorkspaceMember } from './entities/workspace-member.entity';
 
 @Module({
-  controllers: [WorkspaceMemberController],
-  providers: [WorkspaceMemberService],
-  imports: [TypeOrmModule.forFeature([WorkspaceMember])],
-  exports: [WorkspaceMemberService]
+    controllers: [WorkspaceMemberController],
+    providers: [WorkspaceMemberService],
+    imports: [TypeOrmModule.forFeature([WorkspaceMember])],
+    exports: [WorkspaceMemberService],
 })
 export class WorkspaceMemberModule {}

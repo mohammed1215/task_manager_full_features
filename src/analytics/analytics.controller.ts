@@ -7,9 +7,10 @@ import {
 } from '@nestjs/common';
 import { AnalyticsService } from './analytics.service';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { User } from '../user/decorator/user.decorator';
 import { type jwtPayload } from '../interface/jwt-payload.interface';
+import { Activity } from "../activity/entities/activity.entity";
 
 @Controller('')
 export class AnalyticsController {
@@ -17,7 +18,8 @@ export class AnalyticsController {
     @Get('workspaces/:workspaceId/dashboard')
     @UseGuards(AuthGuard('jwt'))
     @ApiBearerAuth()
-    dashboard(@Param('workspaceId') workspaceId: string) {
+    @ApiResponse({ status: 200, description: 'Success' })
+    dashboard(@Param('workspaceId') workspaceId: string): Promise<{ totalTasks: number; completedTasks: number; overdueTasks: number; tasksByPriority: { low: number; medium: number; high: number; urgent: number; }; tasksByAssignee: { userId: any; count: any; }[]; recentActivity: Activity[]; completionTrend: { date: any; count: any; }[]; mostActiveBoards: { boardId: any; boardName: any; taskCount: any; }[]; }> {
         return this.analyticsService.dashboard(workspaceId);
     }
 

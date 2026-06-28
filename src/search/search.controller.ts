@@ -5,6 +5,8 @@ import { SearchQueryDto } from './dto/query-search.dto';
 import { type jwtPayload } from '../interface/jwt-payload.interface';
 import { User } from '../user/decorator/user.decorator';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { ColumnEntity } from "../column/entities/column.entity";
+import { PriorityTask } from "../enum/enum";
 
 @ApiTags('Search')
 @ApiBearerAuth()
@@ -22,7 +24,7 @@ export class SearchController {
   globalSearch(
     @User() user: jwtPayload,
     @Query() searchQueryDto:SearchQueryDto
-  ) {
+  ): Promise<{ results: { tasks: { id: string; taskNumber: string; title: string; snippet: string; boardName: string; workspaceName: string; column: ColumnEntity; priority: PriorityTask; }[]; boards: { id: string; title: string; workspaceName: string; snippet: string; }[]; }; totalCount: number; searchTimeMs: number; }> {
   debugger
   console.log(user)
     return this.searchService.globalSearch(user.userId,searchQueryDto);

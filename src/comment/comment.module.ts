@@ -11,18 +11,18 @@ import { WorkspaceMember } from '../workspace-member/entities/workspace-member.e
 import { ActivityModule } from '../activity/activity.module';
 
 @Module({
-  controllers: [CommentController],
-  providers: [CommentService],
-  imports: [
-    TypeOrmModule.forFeature([
-      Comment,
-      Task,
-      BoardMember,
-      TaskWatcher,
-      WorkspaceMember,
-    ]),
-    BoardModule,
-    ActivityModule,
-  ],
+    controllers: [CommentController],
+    providers: [CommentService],
+    imports: [
+        TypeOrmModule.forFeature([
+            Comment,
+            Task,
+            BoardMember,
+            TaskWatcher,
+            WorkspaceMember,
+        ]),
+        BoardModule,
+        ActivityModule,
+    ],
 })
 export class CommentModule {}

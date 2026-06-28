@@ -1,39 +1,39 @@
 import { Task } from '../../task/entities/task.entity';
 import { User } from '../../user/entities/user.entity';
 import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
+    Column,
+    CreateDateColumn,
+    Entity,
+    ManyToOne,
+    PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity()
 export class Attachment {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
 
-  @Column()
-  filename: string;
+    @Column()
+    filename: string;
 
-  @Column()
-  originalFilename: string;
+    @Column()
+    originalFilename: string;
 
-  @Column('float')
-  fileSize: number;
+    @Column('float')
+    fileSize: number;
 
-  @Column()
-  contentType: string;
+    @Column()
+    contentType: string;
 
-  @Column('text')
-  storagePath: string;
+    @Column('text')
+    storagePath: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+    @CreateDateColumn()
+    createdAt: Date;
 
-  @ManyToOne(() => Task, { onDelete: 'CASCADE' })
-  task: Task;
+    @ManyToOne(() => Task, { onDelete: 'CASCADE' })
+    task: Task;
 
-  @ManyToOne(() => User)
-  uploadedBy: User;
+    @ManyToOne(() => User)
+    uploadedBy: User;
 }

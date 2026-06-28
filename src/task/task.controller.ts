@@ -8,14 +8,14 @@ import {
     Delete,
     UseGuards,
     Query,
-    DefaultValuePipe,
-    ParseIntPipe,
+    // DefaultValuePipe,
+    // ParseIntPipe,
     ParseUUIDPipe,
-    ParseEnumPipe,
-    ParseDatePipe,
+    // ParseEnumPipe,
+    // ParseDatePipe,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
-import { CreateTaskDto } from './dto/create-task.dto';
+// import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { JwtGuard } from '../auth/guard/jwt.guard';
 import { User } from '../user/decorator/user.decorator';
@@ -32,6 +32,8 @@ import {
     ApiQuery,
     ApiBody,
 } from '@nestjs/swagger';
+import { Task } from './entities/task.entity';
+import { User as UserType } from '../user/entities/user.entity';
 
 @ApiTags('Tasks')
 @ApiBearerAuth()
@@ -76,7 +78,7 @@ export class TaskController {
         @User() user: jwtPayload,
         @Param('boardId', new ParseUUIDPipe()) boardId: string,
         @Query() findTasksQueryDto: FindTasksQueryDto,
-    ) {
+    ): Promise<{ tasks: Task[]; taskCount: number; pageCount: number }> {
         return this.taskService.findAll(
             user.userId,
             boardId,
@@ -94,13 +96,14 @@ export class TaskController {
     @ApiResponse({
         status: 200,
         description: 'Task details retrieved successfully',
+        type: Task,
     })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 404, description: 'Task not found' })
     findOne(
         @Param('taskId', ParseUUIDPipe) taskId: string,
         @User() user: jwtPayload,
-    ) {
+    ): Promise<Task> {
         return this.taskService.findOne(user.userId, taskId);
     }
 
@@ -112,7 +115,11 @@ export class TaskController {
             'Update task information like title, description, priority, etc.',
     })
     @ApiParam({ name: 'taskId', type: 'string', description: 'Task UUID' })
-    @ApiResponse({ status: 200, description: 'Task updated successfully' })
+    @ApiResponse({
+        status: 200,
+        description: 'Task updated successfully',
+        type: Task,
+    })
     @ApiResponse({ status: 400, description: 'Invalid input data' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 404, description: 'Task not found' })
@@ -121,7 +128,7 @@ export class TaskController {
         @User() user: jwtPayload,
         @Param('taskId') taskId: string,
         @Body() updateTaskDto: UpdateTaskDto,
-    ) {
+    ): Promise<Task> {
         return this.taskService.update(user.userId, taskId, updateTaskDto);
     }
 
@@ -135,7 +142,10 @@ export class TaskController {
     @ApiResponse({ status: 200, description: 'Task deleted successfully' })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiResponse({ status: 404, description: 'Task not found' })
-    remove(@User() user: jwtPayload, @Param('taskId') taskId: string) {
+    remove(
+        @User() user: jwtPayload,
+        @Param('taskId') taskId: string,
+    ): Promise<{ message: string }> {
         return this.taskService.remove(user.userId, taskId);
     }
 
@@ -155,7 +165,7 @@ export class TaskController {
         @User() user: jwtPayload,
         @Param('taskId') taskId: string,
         @Body() assignUsersToTaskDto: AssignUsersToTaskDto,
-    ) {
+    ): Promise<{ id: string; title: string; assignees: UserType[] }> {
         return this.taskService.assignTask(
             user.userId,
             taskId,
@@ -179,7 +189,7 @@ export class TaskController {
         @User() user: jwtPayload,
         @Param('taskId', ParseUUIDPipe) taskId: string,
         @Param('userId', ParseUUIDPipe) userId: string,
-    ) {
+    ): Promise<{ message: string }> {
         return this.taskService.unassignTask(user.userId, taskId, userId);
     }
 
@@ -199,7 +209,7 @@ export class TaskController {
         @User() user: jwtPayload,
         @Param('taskId') taskId: string,
         @Body() moveTaskDto: MoveTaskDto,
-    ) {
+    ): Promise<{ message: string }> {
         return this.taskService.moveTask(user.userId, taskId, moveTaskDto);
     }
 }

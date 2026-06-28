@@ -6,9 +6,11 @@ import {
     Entity,
     ManyToOne,
     PrimaryGeneratedColumn,
+    Unique,
 } from 'typeorm';
 
 @Entity()
+@Unique(['task', 'user'])
 export class TaskAssignee {
     @PrimaryGeneratedColumn('uuid')
     id: string;

@@ -3,7 +3,6 @@ import {
     Get,
     Post,
     Body,
-    Patch,
     Param,
     Delete,
     UseGuards,
@@ -11,11 +10,11 @@ import {
     UploadedFile,
     MaxFileSizeValidator,
     ParseFilePipe,
+    StreamableFile,
 } from '@nestjs/common';
 
 import { AttachmentService } from './attachment.service';
 import { CreateAttachmentDto } from './dto/create-attachment.dto';
-import { UpdateAttachmentDto } from './dto/update-attachment.dto';
 import { JwtGuard } from '../auth/guard/jwt.guard';
 import { User } from '../user/decorator/user.decorator';
 import { type jwtPayload } from '../interface/jwt-payload.interface';
@@ -29,6 +28,7 @@ import {
     ApiConsumes,
     ApiBody,
 } from '@nestjs/swagger';
+import { Attachment } from './entities/attachment.entity';
 
 @ApiTags('Attachments')
 @ApiBearerAuth()
@@ -59,6 +59,7 @@ export class AttachmentController {
     @ApiResponse({
         status: 201,
         description: 'Attachment uploaded successfully',
+        type: Attachment,
     })
     @ApiResponse({ status: 400, description: 'File too large' })
     create(
@@ -75,13 +76,8 @@ export class AttachmentController {
             }),
         )
         attachment: Express.Multer.File,
-    ) {
-        return this.attachmentService.create(
-            user.userId,
-            taskId,
-            attachment,
-            createAttachmentDto,
-        );
+    ): Promise<Attachment> {
+        return this.attachmentService.create(user.userId, taskId, attachment);
     }
 
     @Get('tasks/:taskId/attachments')
@@ -94,7 +90,9 @@ export class AttachmentController {
         status: 200,
         description: 'Attachments retrieved successfully',
     })
-    findAll(@Param('taskId') taskId: string) {
+    findAll(
+        @Param('taskId') taskId: string,
+    ): Promise<{ attachments: Attachment[] }> {
         return this.attachmentService.findAll(taskId);
     }
 
@@ -116,17 +114,20 @@ export class AttachmentController {
     })
     @ApiResponse({ status: 200, description: 'File downloaded successfully' })
     @ApiResponse({ status: 404, description: 'Attachment not found' })
-    downloadAttachment(@Param('attachmentId') attachmentId: string) {
+    downloadAttachment(
+        @Param('attachmentId') attachmentId: string,
+    ): Promise<StreamableFile | { url: string; redirect: boolean }> {
         return this.attachmentService.download(attachmentId);
     }
 
-    @Patch(':id')
-    update(
-        @Param('id') id: string,
-        @Body() updateAttachmentDto: UpdateAttachmentDto,
-    ) {
-        return this.attachmentService.update(+id, updateAttachmentDto);
-    }
+    // @Patch(':id')
+    // @ApiResponse({ status: 200, type: string, description: 'Success' })
+    // update(
+    //     @Param('id') id: string,
+    //     @Body() updateAttachmentDto: UpdateAttachmentDto,
+    // ): string {
+    //     return this.attachmentService.update(+id, updateAttachmentDto);
+    // }
 
     @Delete('attachments/{attachmentId}')
     @ApiOperation({
@@ -145,7 +146,7 @@ export class AttachmentController {
     remove(
         @User() user: jwtPayload,
         @Param('attachmentId') attachmentId: string,
-    ) {
+    ): Promise<{ message: string }> {
         return this.attachmentService.remove(attachmentId, user.userId);
     }
 }

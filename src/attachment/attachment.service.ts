@@ -5,8 +5,6 @@ import {
     NotFoundException,
     StreamableFile,
 } from '@nestjs/common';
-import { CreateAttachmentDto } from './dto/create-attachment.dto';
-import { UpdateAttachmentDto } from './dto/update-attachment.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Attachment } from './entities/attachment.entity';
 import { Repository } from 'typeorm';
@@ -39,7 +37,6 @@ export class AttachmentService {
         userId: string,
         taskId: string,
         attachment: Express.Multer.File,
-        createAttachmentDto: CreateAttachmentDto,
     ) {
         // check if task exists
         const task = await this.taskRepo.findOne({
@@ -165,9 +162,9 @@ export class AttachmentService {
         });
     }
 
-    update(id: number, updateAttachmentDto: UpdateAttachmentDto) {
-        return `This action updates a #${id} attachment`;
-    }
+    // update(id: number, updateAttachmentDto: UpdateAttachmentDto) {
+    //     return `This action updates a #${id} attachment`;
+    // }
 
     async remove(attachmentId: string, userId: string) {
         //check if attachment exists or not

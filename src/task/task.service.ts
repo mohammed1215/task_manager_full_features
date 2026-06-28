@@ -401,7 +401,11 @@ export class TaskService {
         taskId: string,
         assignUsersToTaskDto: AssignUsersToTaskDto,
     ) {
-        //check user in board
+        const uniqueAssigneeIds = Array.from(
+            new Set(assignUsersToTaskDto.assigneeIds),
+        );
+
+        // check user in board
         const task = await this.taskRepo.findOne({
             where: { id: taskId },
             relations: ['board', 'createdBy'],
@@ -412,12 +416,6 @@ export class TaskService {
             userId,
             task.board.id,
         );
-        console.log(assignUsersToTaskDto.assigneeIds);
-        const values = assignUsersToTaskDto.assigneeIds?.map((id) => ({
-            assignedBy: userId,
-            task: { id: taskId },
-            user: { id },
-        }));
 
         if (boardMember.role === BoardRoles.VIEWER) {
             throw new ForbiddenException(
@@ -425,72 +423,65 @@ export class TaskService {
             );
         }
 
-        //check if assigneeIds exists in board
         const boardMembers = await this.boardMemberRepo.find({
             where: {
                 board: { id: task.board.id },
-                user: In(assignUsersToTaskDto.assigneeIds),
+                user: In(uniqueAssigneeIds),
             },
         });
 
-        if (
-            boardMembers.length !==
-            new Set(assignUsersToTaskDto.assigneeIds).size
-        ) {
+        if (boardMembers.length !== uniqueAssigneeIds.length) {
             throw new BadRequestException(
                 'One or more users do not belong to this workspace',
             );
         }
 
-        // if user exists
-
-        const insertedResult = await this.taskAssigneeRepo
-            .createQueryBuilder('task_assignee')
-            .insert()
-            .into('task_assignee')
-            .values([...values])
-            .orIgnore()
-            .returning('*')
-            .execute();
-
-        // map assignees to watchers
-        const watcherList = assignUsersToTaskDto.assigneeIds?.map<
-            DeepPartial<TaskWatcher>
-        >((assigneeId) => {
-            return {
-                task: { id: taskId },
-                user: { id: assigneeId },
-            };
-        });
-
-        // add creator of task to the watchers if it doesn't exists
-        watcherList.push({
+        const values = uniqueAssigneeIds.map((id) => ({
+            assignedBy: { id: userId },
             task: { id: taskId },
-            user: { id: task.createdBy.id },
+            user: { id },
+        }));
+
+        const existingAssignees = await this.taskAssigneeRepo.find({
+            where: {
+                task: { id: taskId },
+                user: In(uniqueAssigneeIds),
+            },
+            select: ['id'],
+            relations: ['user'],
         });
+        const existingUserIds = new Set(
+            existingAssignees.map((a) => a.user.id),
+        );
+
+        await this.taskAssigneeRepo.upsert(values, {
+            conflictPaths: ['task', 'user'],
+            skipUpdateIfNoValuesChanged: true,
+        });
+        const newlyAssignedIds = uniqueAssigneeIds.filter(
+            (id) => !existingUserIds.has(id),
+        );
+        const watcherUserIds = new Set([
+            ...uniqueAssigneeIds,
+            task.createdBy.id,
+        ]);
+        const watcherList = Array.from(watcherUserIds).map((id) => ({
+            task: { id: taskId },
+            user: { id },
+        }));
 
         // add watchers
-        const watchers = this.taskWatcherRepo
-            .createQueryBuilder('task_watcher')
-            .insert()
-            .into('task_watcher')
-            .values(watcherList)
-            .orIgnore()
-            .execute();
+        await this.taskWatcherRepo.upsert(watcherList, {
+            conflictPaths: ['task', 'user'],
+            skipUpdateIfNoValuesChanged: true,
+        });
 
         // email notification
-        const userIds = insertedResult.raw?.map((row) => row.userId);
-        let users: User[];
-        if (userIds.length > 0) {
-            // get emails
-            users = await this.userRepo.find({
-                where: {
-                    id: In(userIds),
-                },
+        if (newlyAssignedIds.length > 0) {
+            const users = await this.userRepo.find({
+                where: { id: In(newlyAssignedIds) },
             });
-
             for (const user of users) {
-                // send notifications
                 this.eventEmitter.emit('notification.task_assigned', {
                     userId: user.id,
                     email: user.email,
@@ -510,10 +501,11 @@ export class TaskService {
             activityType: ActivityTypes.assigned,
             fieldName: 'assignees',
             oldValue: null,
-            newValue: { assignedUserIds: assignUsersToTaskDto.assigneeIds },
+            newValue: { assignedUserIds: uniqueAssigneeIds },
             taskId: taskId,
             actorId: userId,
         });
+
         return {
             id: task.id,
             title: task.title,

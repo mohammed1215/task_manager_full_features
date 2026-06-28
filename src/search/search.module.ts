@@ -7,8 +7,8 @@ import { Task } from '../task/entities/task.entity';
 import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity';
 
 @Module({
-  controllers: [SearchController],
-  providers: [SearchService],
-  imports: [TypeOrmModule.forFeature([Task,Board,WorkspaceMember])]
+    controllers: [SearchController],
+    providers: [SearchService],
+    imports: [TypeOrmModule.forFeature([Task, Board, WorkspaceMember])],
 })
 export class SearchModule {}

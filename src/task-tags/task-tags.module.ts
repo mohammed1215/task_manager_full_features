@@ -3,7 +3,7 @@ import { TaskTagsService } from './task-tags.service';
 import { TaskTagsController } from './task-tags.controller';
 
 @Module({
-  controllers: [TaskTagsController],
-  providers: [TaskTagsService],
+    controllers: [TaskTagsController],
+    providers: [TaskTagsService],
 })
 export class TaskTagsModule {}

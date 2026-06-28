@@ -20,7 +20,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { User } from '../user/decorator/user.decorator';
 import { type jwtPayload } from '../interface/jwt-payload.interface';
-
+import { User as UserType } from '../user/entities/user.entity';
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
@@ -37,7 +37,9 @@ export class AuthController {
     })
     @ApiResponse({ status: 400, description: 'Invalid input data' })
     @ApiBody({ type: CreateUserDto })
-    async register(@Body() createUserDto: CreateUserDto) {
+    async register(
+        @Body() createUserDto: CreateUserDto,
+    ): Promise<{ message: string; userId: string }> {
         const user = await this.authService.register(createUserDto);
         return {
             message: 'user registered successfully please verify your email',
@@ -56,7 +58,13 @@ export class AuthController {
     })
     @ApiResponse({ status: 401, description: 'Invalid credentials' })
     @ApiBody({ type: LoginDto })
-    async login(@Body() loginDto: LoginDto) {
+    async login(@Body() loginDto: LoginDto): Promise<{
+        expiresIn: number;
+        tokenType: string;
+        accessToken: string;
+        refreshToken: string;
+        user: UserType;
+    }> {
         const result = await this.authService.login(loginDto);
         return {
             ...result,
@@ -79,7 +87,9 @@ export class AuthController {
             },
         },
     })
-    async forgotPassword(@Body('email') email: string) {
+    async forgotPassword(
+        @Body('email') email: string,
+    ): Promise<{ message: string }> {
         if (!email) throw new BadRequestException('Email must be provided');
         return this.authService.forgotPassword(email);
     }
@@ -111,7 +121,7 @@ export class AuthController {
         @Query('token') resetToken: string,
         @Query('id') userId: string,
         @Body('password') password: string,
-    ) {
+    ): Promise<{ message: string }> {
         if (!password)
             throw new BadRequestException('password must be provided');
         return this.authService.resetPassword(resetToken, userId, password);
@@ -133,7 +143,7 @@ export class AuthController {
     async verifyEmail(
         @Query('token') verifyToken: string,
         @Query('id') userId: string,
-    ) {
+    ): Promise<{ message: string }> {
         return this.authService.verifyEmail(verifyToken, userId);
     }
 
@@ -146,7 +156,10 @@ export class AuthController {
             },
         },
     })
-    async refreshToken(@User() user: jwtPayload) {
+    @ApiResponse({ status: 200, description: 'Success' })
+    async refreshToken(
+        @User() user: jwtPayload,
+    ): Promise<{ accessToken: string; refreshToken: string }> {
         return this.authService.refreshToken(user);
     }
 

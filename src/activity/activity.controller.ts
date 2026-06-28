@@ -24,6 +24,7 @@ import {
     ApiQuery,
     ApiParam,
 } from '@nestjs/swagger';
+import { Activity } from "./entities/activity.entity";
 
 @ApiTags('Activity')
 @ApiBearerAuth()
@@ -38,8 +39,7 @@ export class ActivityController {
         description: 'Log a new activity',
     })
     @ApiResponse({ status: 201, description: 'Activity created successfully' })
-    @ApiBody({ type: CreateActivityDto })
-    create(@Body() createActivityDto: CreateActivityDto) {
+    create(@Body() createActivityDto: CreateActivityDto): Promise<Activity> {
         return this.activityService.create(createActivityDto);
     }
 
@@ -64,9 +64,9 @@ export class ActivityController {
         description: 'Items per page',
     })
     @ApiResponse({
-        status: 200,
-        description: 'Activity log retrieved successfully',
-    })
+                    status: 200,
+                    description: 'Activity log retrieved successfully',
+                })
     @ApiResponse({ status: 404, description: 'Task not found' })
     findAll(
         @User(JwtGuard) user: jwtPayload,
@@ -85,7 +85,7 @@ export class ActivityController {
             new ParsePositivePipe(true),
         )
         limit: number,
-    ) {
+    ): Promise<{ activities: Activity[]; pageCount: number; repoCount: number; }> {
         return this.activityService.findAll(user.userId, taskId, page, limit);
     }
 

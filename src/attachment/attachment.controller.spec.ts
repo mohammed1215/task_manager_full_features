@@ -3,18 +3,18 @@ import { AttachmentController } from './attachment.controller';
 import { AttachmentService } from './attachment.service';
 
 describe('AttachmentController', () => {
-  let controller: AttachmentController;
+    let controller: AttachmentController;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [AttachmentController],
-      providers: [AttachmentService],
-    }).compile();
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            controllers: [AttachmentController],
+            providers: [AttachmentService],
+        }).compile();
 
-    controller = module.get<AttachmentController>(AttachmentController);
-  });
+        controller = module.get<AttachmentController>(AttachmentController);
+    });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
+    it('should be defined', () => {
+        expect(controller).toBeDefined();
+    });
 });

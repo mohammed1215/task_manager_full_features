@@ -67,8 +67,10 @@ export class NotificationGateway implements OnGatewayConnection {
         return 'Hello world!';
     }
 
-    handleNotificationCount(userId: string) {
-        return this.notificationService.countNotifications(userId);
+    async handleNotificationCount(userId: string) {
+        const notificationCount =
+            await this.notificationService.countNotifications(userId);
+        this.sendToUser(userId, 'notification-count', { notificationCount });
     }
 
     sendToUser(userId: string, event: string, payload?: any) {

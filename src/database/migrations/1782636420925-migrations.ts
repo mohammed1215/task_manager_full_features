@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Migrations1776679303035 implements MigrationInterface {
-    name = 'Migrations1776679303035';
+export class Migrations1782636420925 implements MigrationInterface {
+    name = 'Migrations1782636420925';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(
@@ -32,7 +32,7 @@ export class Migrations1776679303035 implements MigrationInterface {
             `CREATE TABLE "tag" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying(30) NOT NULL, "color" character varying NOT NULL, "groupName" character varying, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "workspaceId" uuid, CONSTRAINT "unique_tag_per_workspace" UNIQUE ("workspaceId", "name"), CONSTRAINT "PK_8e4052373c579afc1471f526760" PRIMARY KEY ("id"))`,
         );
         await queryRunner.query(
-            `CREATE TABLE "task_assignee" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "assignedAt" TIMESTAMP NOT NULL DEFAULT now(), "assignedById" uuid, "taskId" uuid, "userId" uuid, CONSTRAINT "PK_75114a0b55080c15694f3d40ec9" PRIMARY KEY ("id"))`,
+            `CREATE TABLE "task_assignee" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "assignedAt" TIMESTAMP NOT NULL DEFAULT now(), "assignedById" uuid, "taskId" uuid, "userId" uuid, CONSTRAINT "UQ_5b054eee0df61291517e4768606" UNIQUE ("taskId", "userId"), CONSTRAINT "PK_75114a0b55080c15694f3d40ec9" PRIMARY KEY ("id"))`,
         );
         await queryRunner.query(
             `CREATE TABLE "task_watcher" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "watchedAt" TIMESTAMP NOT NULL DEFAULT now(), "taskId" uuid, "userId" uuid, CONSTRAINT "UQ_dec52062bc494eb8addae2788f9" UNIQUE ("taskId", "userId"), CONSTRAINT "PK_a1ec0e63a7b7d14084249fcf2f8" PRIMARY KEY ("id"))`,
@@ -62,7 +62,13 @@ export class Migrations1776679303035 implements MigrationInterface {
             `CREATE TABLE "user" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "email" character varying NOT NULL, "password" character varying NOT NULL, "firstname" character varying NOT NULL, "lastname" character varying NOT NULL, "avatarUrl" character varying, "bio" character varying, "emailVerified" boolean NOT NULL DEFAULT false, "emailPreference" "public"."UserEmailPreference_Enum" NOT NULL DEFAULT 'immediate', "isActive" boolean NOT NULL DEFAULT false, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "lastLoginAt" TIMESTAMP, "failedLoginAttempts" integer NOT NULL DEFAULT '0', "lockUntil" TIMESTAMP, CONSTRAINT "UQ_e12875dfb3b1d92d7d7c5377e22" UNIQUE ("email"), CONSTRAINT "PK_cace4a159ff9f2512dd42373760" PRIMARY KEY ("id"))`,
         );
         await queryRunner.query(
-            `CREATE TABLE "workspace_member" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "role" "public"."WorkspaceMemberRolesEnum" NOT NULL, "joinedAt" TIMESTAMP NOT NULL DEFAULT now(), "emailPreference" "public"."UserEmailPreference_Enum", "workspaceId" uuid, "userId" uuid, "invitedById" uuid, CONSTRAINT "PK_a3a35f64bf30517010551467c6e" PRIMARY KEY ("id"))`,
+            `CREATE TYPE "public"."workspace_member_role_enum" AS ENUM('owner', 'admin', 'member', 'viewer')`,
+        );
+        await queryRunner.query(
+            `CREATE TYPE "public"."workspace_member_emailpreference_enum" AS ENUM('immediate', 'daily_digest', 'disabled')`,
+        );
+        await queryRunner.query(
+            `CREATE TABLE "workspace_member" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "role" "public"."workspace_member_role_enum" NOT NULL, "joinedAt" TIMESTAMP NOT NULL DEFAULT now(), "emailPreference" "public"."workspace_member_emailpreference_enum", "workspaceId" uuid, "userId" uuid, "invitedById" uuid, CONSTRAINT "PK_a3a35f64bf30517010551467c6e" PRIMARY KEY ("id"))`,
         );
         await queryRunner.query(
             `CREATE TYPE "public"."NotificationTypesEnum" AS ENUM('TASK_ASSIGNED', 'USER_MENTIONED', 'TASK_DUE_SOON', 'TASK_OVERDUE', 'WORKSPACE_INVITATION', 'WATCHED_TASK_COMMENT', 'TASK_UNASSIGNED', 'TASK_CREATED')`,
@@ -155,13 +161,13 @@ export class Migrations1776679303035 implements MigrationInterface {
             `ALTER TABLE "invitation" ADD CONSTRAINT "FK_9c6c084bcf65973479beb5cd632" FOREIGN KEY ("workspaceId") REFERENCES "workspace"("id") ON DELETE CASCADE ON UPDATE NO ACTION`,
         );
         await queryRunner.query(
-            `ALTER TABLE "workspace_member" ADD CONSTRAINT "FK_15b622cbfffabc30d7dbc52fede" FOREIGN KEY ("workspaceId") REFERENCES "workspace"("id") ON DELETE CASCADE ON UPDATE NO ACTION`,
+            `ALTER TABLE "workspace_member" ADD CONSTRAINT "FK_15b622cbfffabc30d7dbc52fede" FOREIGN KEY ("workspaceId") REFERENCES "workspace"("id") ON DELETE CASCADE ON UPDATE CASCADE`,
         );
         await queryRunner.query(
-            `ALTER TABLE "workspace_member" ADD CONSTRAINT "FK_03ce416ae83c188274dec61205c" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE NO ACTION`,
+            `ALTER TABLE "workspace_member" ADD CONSTRAINT "FK_03ce416ae83c188274dec61205c" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE`,
         );
         await queryRunner.query(
-            `ALTER TABLE "workspace_member" ADD CONSTRAINT "FK_b9314196ac60f68218dc7942142" FOREIGN KEY ("invitedById") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE NO ACTION`,
+            `ALTER TABLE "workspace_member" ADD CONSTRAINT "FK_b9314196ac60f68218dc7942142" FOREIGN KEY ("invitedById") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE`,
         );
         await queryRunner.query(
             `ALTER TABLE "notification" ADD CONSTRAINT "FK_1ced25315eb974b73391fb1c81b" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
@@ -279,10 +285,10 @@ export class Migrations1776679303035 implements MigrationInterface {
         await queryRunner.query(`DROP TYPE "public"."NotificationTypesEnum"`);
         await queryRunner.query(`DROP TABLE "workspace_member"`);
         await queryRunner.query(
-            `DROP TYPE "public"."UserEmailPreference_Enum"`,
+            `DROP TYPE "public"."workspace_member_emailpreference_enum"`,
         );
         await queryRunner.query(
-            `DROP TYPE "public"."WorkspaceMemberRolesEnum"`,
+            `DROP TYPE "public"."workspace_member_role_enum"`,
         );
         await queryRunner.query(`DROP TABLE "user"`);
         await queryRunner.query(

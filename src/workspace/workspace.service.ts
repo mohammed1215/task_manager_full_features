@@ -40,7 +40,7 @@ export class WorkspaceService {
         private readonly userService: UserService,
         private readonly eventEmitter: EventEmitter2,
         private readonly boardService: BoardService,
-    ) {}
+    ) { }
     async create(userId: string, createWorkspaceDto: CreateWorkspaceDto) {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
@@ -171,7 +171,7 @@ export class WorkspaceService {
         workspaceId: string,
         updateWorkspaceDto: UpdateWorkspaceDto,
     ) {
-        const dbPayload: any = { ...updateWorkspaceDto };
+        const dbPayload: UpdateWorkspaceDto & { slug?: string } = { ...updateWorkspaceDto };
         if (updateWorkspaceDto?.name) {
             dbPayload.slug = slugify(updateWorkspaceDto.name, { lower: true });
         }
@@ -308,12 +308,12 @@ export class WorkspaceService {
                 if (count <= 1) {
                     throw new BadRequestException('cannot delete last owner');
                 }
-                const result = await this.workspaceMemberRepo.delete({
+                await this.workspaceMemberRepo.delete({
                     id: member.id,
                 });
                 return 'user deleted from workspace successfully';
             } else {
-                const result = await this.workspaceMemberRepo.delete({
+                await this.workspaceMemberRepo.delete({
                     id: member.id,
                 });
                 return 'user deleted from workspace successfully';

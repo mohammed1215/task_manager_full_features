@@ -31,6 +31,8 @@ import {
     ApiBody,
 } from '@nestjs/swagger';
 import { QueryColumnDto } from './dto/find-column-queries.dto';
+import { Task } from "../task/entities/task.entity";
+import { ColumnEntity } from "./entities/column.entity";
 
 @ApiTags('Columns & Boards Management')
 @ApiBearerAuth()
@@ -40,7 +42,7 @@ export class ColumnController {
         private readonly columnService: ColumnService,
         private readonly boardService: BoardService,
         private readonly taskService: TaskService,
-    ) {}
+    ) { }
 
     @Post(':boardId/columns')
     @UseGuards(JwtGuard)
@@ -49,14 +51,14 @@ export class ColumnController {
         description: 'Create a new column in a board',
     })
     @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
-    @ApiResponse({ status: 201, description: 'Column created successfully' })
+    @ApiResponse({ status: 201, description: 'Column created successfully', type: ColumnEntity })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     @ApiBody({ type: CreateColumnDto })
     create(
         @User() user: jwtPayload,
         @Param('boardId') boardId: string,
         @Body() createColumnDto: CreateColumnDto,
-    ) {
+    ): Promise<ColumnEntity> {
         return this.columnService.create(user.userId, boardId, createColumnDto);
     }
 
@@ -67,13 +69,13 @@ export class ColumnController {
         description: 'Retrieve all columns for a specific board',
     })
     @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
-    @ApiResponse({ status: 200, description: 'Columns retrieved successfully' })
+    @ApiResponse({ status: 200, description: 'Columns retrieved successfully', type: ColumnEntity, isArray: true })
     @ApiResponse({ status: 401, description: 'Unauthorized' })
     findAll(
         @Param('boardId') boardId: string,
         @User() user: jwtPayload,
         @Query() columnQueryDto: QueryColumnDto,
-    ) {
+    ): Promise<ColumnEntity[]> {
         return this.columnService.findAll(
             user.userId,
             boardId,
@@ -93,13 +95,12 @@ export class ColumnController {
         description: 'Create a new task directly in a board',
     })
     @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
-    @ApiResponse({ status: 201, description: 'Task created successfully' })
-    @ApiBody({ type: CreateTaskDto })
+    @ApiResponse({ status: 201, description: 'Task created successfully'})
     createTasks(
         @User() user: jwtPayload,
         @Param('boardId') boardId: string,
         @Body() createTaskDto: CreateTaskDto,
-    ) {
+    ): Promise<Task> {
         return this.taskService.create(user.userId, boardId, createTaskDto);
     }
 
@@ -110,8 +111,15 @@ export class ColumnController {
         description: 'Archive a board to hide it from active boards',
     })
     @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
-    @ApiResponse({ status: 200, description: 'Board archived successfully' })
-    archiveBoard(@User() user: jwtPayload, @Param('boardId') boardId: string) {
+    @ApiResponse({
+        status: 200, description: 'Board archived successfully', schema: {
+            type: 'object',
+            properties: {
+                message: { type: 'string', example: 'Comment deleted successfully' }
+            }
+        }
+    })
+    archiveBoard(@User() user: jwtPayload, @Param('boardId') boardId: string): Promise<{ message: string; }> {
         return this.boardService.archiveBoard(user.userId, boardId);
     }
 
@@ -122,8 +130,15 @@ export class ColumnController {
         description: 'Restore an archived board back to active',
     })
     @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
-    @ApiResponse({ status: 200, description: 'Board restored successfully' })
-    restoreBoard(@User() user: jwtPayload, @Param('boardId') boardId: string) {
+    @ApiResponse({
+        status: 200, description: 'Board restored successfully', schema: {
+            type: 'object',
+            properties: {
+                message: { type: 'string', example: 'Comment deleted successfully' }
+            }
+        }
+    })
+    restoreBoard(@User() user: jwtPayload, @Param('boardId') boardId: string): Promise<{ message: string; }> {
         return this.boardService.restoreBoard(user.userId, boardId);
     }
     @Patch(':boardId')
@@ -133,13 +148,20 @@ export class ColumnController {
         description: 'Update board information',
     })
     @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
-    @ApiResponse({ status: 200, description: 'Board updated successfully' })
+    @ApiResponse({
+        status: 200, description: 'Board updated successfully', schema: {
+            type: 'object',
+            properties: {
+                message: { type: 'string', example: 'board has been updated succesfully' }
+            }
+        }
+    })
     @ApiBody({ type: UpdateBoardDto })
     updateBoard(
         @Param('boardId') boardId: string,
         @Body() updateBoardDto: UpdateBoardDto,
         @User() user: jwtPayload,
-    ) {
+    ): Promise<{ message: string; }> {
         return this.boardService.update(user.userId, boardId, updateBoardDto);
     }
 
@@ -150,12 +172,12 @@ export class ColumnController {
         description: 'Remove a board permanently',
     })
     @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
-    @ApiResponse({ status: 200, description: 'Board deleted successfully' })
+    @ApiResponse({ status: 200, description: 'Board deleted successfully'})
     removeBoard(
         @Param('boardId') boardId: string,
         @User() user: jwtPayload,
         @Body('confirmation') confirmation: string,
-    ) {
+    ): Promise<{ message: string; }> {
         return this.boardService.remove(user.userId, boardId, confirmation);
     }
 
@@ -167,14 +189,14 @@ export class ColumnController {
     })
     @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
     @ApiParam({ name: 'columnId', type: 'string', description: 'Column UUID' })
-    @ApiResponse({ status: 200, description: 'Column updated successfully' })
+    @ApiResponse({ status: 200, description: 'Column updated successfully'})
     @ApiBody({ type: UpdateColumnDto })
     update(
         @Param('boardId') boardId: string,
         @Param('columnId') columnId: string,
         @Body() updateColumnDto: UpdateColumnDto,
         @User() user: jwtPayload,
-    ) {
+    ): Promise<{ message: string; }> {
         return this.columnService.update(
             boardId,
             columnId,
@@ -196,7 +218,7 @@ export class ColumnController {
         @Param('boardId') boardId: string,
         @Body() reOrderColumnDto: ReOrderColumnDto,
         @User() user: jwtPayload,
-    ) {
+    ): Promise<void> {
         return this.columnService.reorder(
             user.userId,
             boardId,
@@ -212,12 +234,12 @@ export class ColumnController {
     })
     @ApiParam({ name: 'boardId', type: 'string', description: 'Board UUID' })
     @ApiParam({ name: 'columnId', type: 'string', description: 'Column UUID' })
-    @ApiResponse({ status: 200, description: 'Column deleted successfully' })
+    @ApiResponse({ status: 200, description: 'Column deleted successfully'})
     remove(
         @Param('boardId') boardId: string,
         @Param('columnId') columnId: string,
         @User() user: jwtPayload,
-    ) {
+    ): Promise<{ message: string; }> {
         return this.columnService.remove(user.userId, boardId, columnId);
     }
 }

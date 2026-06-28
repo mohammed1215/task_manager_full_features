@@ -29,6 +29,9 @@ import {
     ApiBody,
 } from '@nestjs/swagger';
 import { WorkspaceMemberRoles } from '../enum/enum';
+import { WorkspaceMember } from '../workspace-member/entities/workspace-member.entity';
+import { Invitation } from './entities/invitation.entity';
+import { Workspace } from './entities/workspace.entity';
 
 @ApiTags('Workspaces')
 @ApiBearerAuth()
@@ -49,7 +52,16 @@ export class WorkspaceController {
     async create(
         @User() user: jwtPayload,
         @Body() createWorkspaceDto: CreateWorkspaceDto,
-    ) {
+    ): Promise<{
+        id: string;
+        name: string;
+        slug: string;
+        description: string;
+        isPrivate: boolean;
+        ownerId: string;
+        createdAt: Date;
+        memberCount: number;
+    }> {
         const workspace = await this.workspaceService.create(
             user.userId,
             createWorkspaceDto,
@@ -96,7 +108,11 @@ export class WorkspaceController {
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
         @Query('filter', new DefaultValuePipe('all'))
         filter: 'owned' | 'member' | 'all',
-    ) {
+    ): Promise<{
+        workspaces: Workspace[];
+        workspaceCount: number;
+        pageCount: number;
+    }> {
         return this.workspaceService.findAll(user.userId, limit, page, filter);
     }
 
@@ -118,7 +134,7 @@ export class WorkspaceController {
         @User() user: jwtPayload,
         @Param('workspaceId') workspaceId: string,
         @Body() updateWorkspaceDto: UpdateWorkspaceDto,
-    ) {
+    ): Promise<{ message: string }> {
         return this.workspaceService.update(
             user.userId,
             workspaceId,
@@ -143,7 +159,7 @@ export class WorkspaceController {
         @Param('workspaceId') workspaceId: string,
         @User() user: jwtPayload,
         @Body('confirmation') confirmation: string,
-    ) {
+    ): Promise<{ message: string }> {
         return this.workspaceService.removeWorkspace(
             user.userId,
             workspaceId,
@@ -161,9 +177,16 @@ export class WorkspaceController {
         type: 'string',
         description: 'Workspace UUID',
     })
-    @ApiResponse({ status: 200, description: 'Members retrieved successfully' })
+    @ApiResponse({
+        status: 200,
+        description: 'Members retrieved successfully',
+        type: WorkspaceMember,
+        isArray: true,
+    })
     @ApiResponse({ status: 404, description: 'Workspace not found' })
-    findMembers(@Param('workspaceId') workspaceId: string) {
+    findMembers(
+        @Param('workspaceId') workspaceId: string,
+    ): Promise<WorkspaceMember[]> {
         return this.workspaceService.findMembersForOneWorkspace(workspaceId);
     }
 
@@ -195,7 +218,7 @@ export class WorkspaceController {
         @User() currentUser: jwtPayload,
         @Param('userId') userId: string,
         @Body('role') role: Exclude<WorkspaceMemberRoles, 'owner'>,
-    ) {
+    ): Promise<{ message: string }> {
         const allowedRoles = Object.values(WorkspaceMemberRoles).filter(
             (role) => role !== 'owner',
         );
@@ -229,7 +252,10 @@ export class WorkspaceController {
         @Param('workspaceId') workspaceId: string,
         @Param('userId') userId: string,
         @User() currentUser: jwtPayload,
-    ) {
+    ): Promise<
+        | 'user deleted from workspace successfully'
+        | 'user has been removed from workspace successfully'
+    > {
         return this.workspaceService.remove(
             workspaceId,
             userId,
@@ -255,7 +281,7 @@ export class WorkspaceController {
         @Param('workspaceId') workspaceId: string,
         @User() user: jwtPayload,
         @Body() createInvitationDto: CreateInvitationDto,
-    ) {
+    ): Promise<{ message: string; invitation: Invitation }> {
         return this.workspaceService.inviteMember(
             workspaceId,
             user.userId,
@@ -288,7 +314,7 @@ export class WorkspaceController {
         @Query('invitationId') invitationId: string,
         @Query('senderId') senderId: string,
         @User() user: jwtPayload,
-    ) {
+    ): Promise<{ message: string }> {
         const workspaceMember = await this.workspaceService.acceptInvitation(
             invitationId,
             user.userId,
